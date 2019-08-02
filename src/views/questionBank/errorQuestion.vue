@@ -4,10 +4,12 @@
     <commonNav :active="active" :showType="showType" @changeModal="changeType">
       <template slot="content">
         <div v-show="active === 'answer'">
-          答题模式内容
+          <answer-question></answer-question>
+          <!-- 底部操作等 -->
+          <questionFooter :del="true" :uncollected="true"></questionFooter>
         </div>
         <div v-show="active === 'recite'">
-          背题模式内容
+          <recite-question></recite-question>
         </div>
       </template>
     </commonNav>
@@ -15,9 +17,15 @@
 </template>
 <script>
 import commonNav from "../../components/commonNav.vue";
+import questionFooter from "../../components/questionFooter.vue";
+import answerQuestion from "../../components/answerQuestion.vue";
+import reciteQuestion from "../../components/reciteQuestion.vue";
 export default {
   components: {
-    commonNav
+    commonNav,
+    questionFooter,
+    answerQuestion,
+    reciteQuestion
   },
   data() {
     return {
@@ -35,5 +43,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+
+
 </style>
 
