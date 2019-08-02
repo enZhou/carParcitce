@@ -13,6 +13,7 @@ if (process.env.NODE_ENV == 'production') {
     axios.defaults.baseURL = 'http://www.jiaoliantong.online/demo/';
 } else {
     axios.defaults.baseURL = 'http://www.jiaoliantong.online/demo/';
+    // axios.defaults.baseURL = 'http://test.zhangqingxi.cn/'
 }
 
 //http request拦截器

@@ -87,6 +87,12 @@ const router = new Router({
             path: '/stuDetail',
             component: stuDetail
         },
+        // 驾考题库
+        {
+            path: '/questionBank',
+            name: 'questionBank',
+            component: () => import('../views/questionBank/questionBank.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
