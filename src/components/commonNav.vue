@@ -67,17 +67,17 @@ export default {
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
-  height: 50px;
-  padding: 0 10px;
+  height: 1rem;
+  padding: 0 0.2rem;
   font-size: 14px;
   border-bottom: 1px solid #f0f0f0;
   .tabs {
     display: flex;
     flex-wrap: nowrap;
-    border-radius: 4px;
+    border-radius: 0.1rem;
     overflow: hidden;
     .tab {
-      padding: 5px 10px;
+      padding: 0.1rem 0.2rem;
       background-color: #f1f1f1;
     }
     .active {

@@ -93,6 +93,12 @@ const router = new Router({
             name: 'questionBank',
             component: () => import('../views/questionBank/questionBank.vue'),
         },
+        // 我的错题
+        {
+            path: '/errorQuestion',
+            name: 'errorQuestion',
+            component: () => import('../views/questionBank/errorQuestion.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
