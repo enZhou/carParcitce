@@ -4,7 +4,7 @@
     <!-- tab -->
     <div class="tab-header">
       <span>＜</span>
-      <div class="tabs">
+      <div class="tabs" v-if="showType === 'tab'">
         <div
           class="tab"
           :class="{ active: item.type === active }"
@@ -15,10 +15,13 @@
           {{ item.name }}
         </div>
       </div>
+      <div class="time" v-if="showType === 'time'">
+        @ 倒计时44:29
+      </div>
       <span>设置</span>
     </div>
     <!-- 内容  -->
-    <div class="tab-body">
+    <div class="tab-body" v-if="showType === 'tab'">
       <slot name="content"></slot>
     </div>
   </div>
@@ -27,7 +30,7 @@
 export default {
   data() {
     return {
-        navList: [
+      navList: [
         {
           name: "答题模式",
           type: "answer"
@@ -36,13 +39,18 @@ export default {
           name: "背题模式",
           type: "recite"
         }
-      ],
+      ]
     };
   },
   props: {
     active: {
       type: String,
       default: "answer"
+    },
+    showType: {
+      type: String,
+      required: true,
+      default: ""
     }
   },
   methods: {
