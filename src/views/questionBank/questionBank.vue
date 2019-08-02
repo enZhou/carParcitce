@@ -1,8 +1,7 @@
 <template>
-  <div>
-    {{ title }}
+  <div class="questionBank">
     <!-- 答题/背题模式切换 -->
-    <commonNav :active="active" @changeModal="changeType">
+    <!-- <commonNav :active="active" @changeModal="changeType">
       <template slot="content">
         <div v-show="active === 'answer'">
           答题模式内容
@@ -11,18 +10,17 @@
           背题模式内容
         </div>
       </template>
-    </commonNav>
-
-    <newHead></newHead>
+    </commonNav> -->
+    <p class="bank-title">选择题库类型</p>
     <stuFooter></stuFooter>
   </div>
 </template>
 <script>
 import stuFooter from "../../components/stuFooter";
 import newHead from "../../components/newHead";
-import commonNav from "../../components/commonNav.vue";
+// import commonNav from "../../components/commonNav.vue";
 export default {
-  components: { newHead, stuFooter, commonNav },
+  components: { newHead, stuFooter },
   data() {
     return {
       title: "驾考题库",
@@ -38,3 +36,13 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+.questionBank{
+  .bank-title{
+    font-size: 1rem;
+    padding: 1rem;
+    background-color: #1B82D1;
+  }
+}
+</style>
+
