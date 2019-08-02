@@ -1,7 +1,7 @@
 <template>
   <div class="questionBank">
     <!-- 答题/背题模式切换 -->
-    <!-- <commonNav :active="active" @changeModal="changeType">
+    <commonNav :active="active" :showType="showType" @changeModal="changeType">
       <template slot="content">
         <div v-show="active === 'answer'">
           答题模式内容
@@ -10,7 +10,7 @@
           背题模式内容
         </div>
       </template>
-    </commonNav> -->
+    </commonNav>
     <p class="bank-title">选择题库类型</p>
     <stuFooter></stuFooter>
   </div>
@@ -24,7 +24,8 @@ export default {
   data() {
     return {
       title: "驾考题库",
-      active: "answer"//默认答题模式
+      active: "answer",//默认答题模式
+      showType:'tab'
     };
   },
   methods: {
