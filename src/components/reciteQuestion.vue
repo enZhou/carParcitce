@@ -71,20 +71,18 @@ export default {
   width: 100%;
   margin-top: 0.4rem;
   .info_title {
-    position: relative;
     text-align: center;
-
     &:before {
       content: "————";
       color: #f0f0f0; 
-      letter-spacing: -4px;
-      margin-right: 10px;
+      letter-spacing: -0.1rem;
+      margin-right: 0.2rem;
     }
     &:after {
       content: "————";
-      letter-spacing: -4px;
+      letter-spacing: -0.1rem;
       color: #f0f0f0;
-      margin-left: 10px;
+      margin-left: 0.2rem;
     }
   }
   .info_content{

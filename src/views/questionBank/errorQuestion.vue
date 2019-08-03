@@ -10,6 +10,7 @@
         </div>
         <div v-show="active === 'recite'">
           <recite-question></recite-question>
+          <questionFooter :del="true" :uncollected="true"></questionFooter>
         </div>
       </template>
     </commonNav>
