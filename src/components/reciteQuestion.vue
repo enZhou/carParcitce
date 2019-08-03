@@ -75,22 +75,16 @@ export default {
     text-align: center;
 
     &:before {
-      content: "";
-      position: absolute;
-      top: 0.2rem;
-      left: 1.2rem;
-      height: 1px;
-      border: 1px solid #f0f0f0;
-      width: 0.8rem;
+      content: "————";
+      color: #f0f0f0; 
+      letter-spacing: -4px;
+      margin-right: 10px;
     }
     &:after {
-      content: "";
-      position: absolute;
-      top: 0.2rem;
-      right: 1.2rem;
-      height: 1px;
-      border: 1px solid #f0f0f0;
-      width: 0.8rem;
+      content: "————";
+      letter-spacing: -4px;
+      color: #f0f0f0;
+      margin-left: 10px;
     }
   }
   .info_content{
