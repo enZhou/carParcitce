@@ -49,7 +49,7 @@ export default {
     },
     //选择教练:教练列表
     getTrainerList(params) {
-        return axiosPost(`index/coachMembers`,params);
+        return axiosPost(`index/coachMembers`, params);
     },
     //获取教练详情
     getTrainerDetail(id) {
@@ -109,7 +109,7 @@ export default {
         return axiosGet(`index/getStudyRecord?id=${stuId}`);
     },
     //获取学员评价列表
-    getStudentComment(coachId){
+    getStudentComment(coachId) {
         return axiosGet(`index/getEvaluate?coach_id=${coachId}`);
     },
     //教练点击签约
@@ -124,4 +124,10 @@ export default {
     saveTrainerInfo(trainerInfo) {
         return axiosPost(`index/updateUserInfo`, trainerInfo);
     },
+    // 驾考题库首页数据
+    getDrivingMain(id) {
+        return axiosGet(`driving/main?user_id=${id}`);
+    }
+
+
 }

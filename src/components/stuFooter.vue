@@ -37,7 +37,7 @@ export default {
       if (el.path == this.$route.path) {
         console.log(this.$route.path);
         if (
-          this.$route.path == "/ownCenter" &&
+          (this.$route.path == "/ownCenter" || this.$route.path == "/questionBank") &&
           !localStorage.getItem("stuMobile")
         ) {
           this.$toast("无浏览权限，请登录！！！");
