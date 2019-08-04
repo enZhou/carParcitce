@@ -43,7 +43,6 @@
         <div class="func_box">
           <!-- 顺序练习 -->
           <div class="practice_box">
-            
             <!-- 我的错题 -->
             <router-link class="errorTipic" :to="'/errorQuestion'">
               <div class="error_img">
@@ -172,7 +171,12 @@ export default {
       dlType: 0, // 驾驶证类型
       showType: "tab",
       practiceData: {}, // 首页总数据
-      dlData: {}, // 驾驶证数据
+      dlData: {
+        result_msg: null,
+        total_count: null,
+        read_count: null,
+        score: null
+      }, // 驾驶证数据
       userInfo: null // 用户信息
     };
   },
@@ -215,6 +219,15 @@ export default {
      */
     setMainData(type) {
       const vm = this;
+      if (Object.keys(vm.practiceData).length <= 0) {
+        vm.dlData = {
+          result_msg: null,
+          total_count: null,
+          read_count: null,
+          score: null
+        };
+        return false
+      }
       switch (type) {
         case 0:
           vm.dlData = vm.practiceData.small_car;
