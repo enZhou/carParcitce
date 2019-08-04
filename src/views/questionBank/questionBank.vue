@@ -12,7 +12,32 @@
           <span :class="bankType===1?'active':''">科目四</span>
         </div>
       </div>
-      <div class="cnt_body_one" v-if="bankType==0">科目一</div>
+      <div class="cnt_body_one" v-if="bankType==0">
+        <p class="one_driverLicense_type">驾驶证类型</p>
+        <div class="dlType_box">
+          <div class="dlType_item">
+            <div class="smallCar_img">
+              <img src="../../assets/img/release.png" alt srcset />
+            </div>
+            <p>小车</p>
+            <p>C1/C2/C3</p>
+          </div>
+          <div class="dlType_item">
+            <div class="smallCar_img">
+              <img src="../../assets/img/release.png" alt srcset />
+            </div>
+            <p>货车</p>
+            <p>A2/B3</p>
+          </div>
+          <div class="dlType_item">
+            <div class="smallCar_img">
+              <img src="../../assets/img/release.png" alt srcset />
+            </div>
+            <p>客车</p>
+            <p>A1/A3/B1</p>
+          </div>
+        </div>
+      </div>
       <div class="cnt_body_four" v-if="bankType==1">科目四</div>
     </div>
 
@@ -82,6 +107,29 @@ export default {
             border-radius: 2px;
             width: 100%;
           }
+        }
+      }
+    }
+    .cnt_body_one {
+      padding: 0 0.3rem;
+      .one_driverLicense_type {
+        padding: 0.36rem 0;
+      }
+      .dlType_box {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .dlType_item{
+          background-color: #ccc;
+          text-align: center;
+          width: 30%;
+        }
+        .dlType_item:nth-child(2) {
+          width: 40%;
+          align-items: center;
+          color: red;
+          margin: 0 .2rem;
         }
       }
     }

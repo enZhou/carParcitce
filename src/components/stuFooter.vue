@@ -24,6 +24,10 @@ export default {
         {
           name: "关于我们",
           path: "/aboutUs"
+        },
+        {
+          name: "驾考题库",
+          path: "/questionBank"
         }
       ]
     };
