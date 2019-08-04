@@ -161,7 +161,6 @@
 import stuFooter from "../../components/stuFooter";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
-// import commonNav from "../../components/commonNav.vue";
 export default {
   components: { stuFooter },
   data() {
