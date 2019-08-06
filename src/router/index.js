@@ -111,6 +111,18 @@ const router = new Router({
             name: 'examScores',
             component: () => import('../views/questionBank/examScores.vue'),
         },
+        // 我的收藏
+        {
+            path: '/questionCollect',
+            name: 'questionCollect',
+            component: () => import('../views/questionBank/questionCollect.vue'),
+        },
+        // 顺序练题
+        {
+            path: '/questionOrder',
+            name: 'questionOrder',
+            component: () => import('../views/questionBank/questionOrder.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {

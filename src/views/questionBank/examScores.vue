@@ -1,4 +1,4 @@
-<!-- 模拟考试成绩 -->
+<!-- 模拟考试 - 成绩 -->
 <template>
   <div class="box">
     <div class="blueBg">
