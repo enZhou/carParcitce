@@ -16,6 +16,7 @@ export default {
 @import "./style/reset.scss";
 @import "./style/common.scss";
 @import "~@/assets/iconfont/iconfont.css";
+@import "~@/assets/bankIconFont/iconfont.css";
 .slide-enter-active,
 .slide-leave-active {
   opacity: 0.5;

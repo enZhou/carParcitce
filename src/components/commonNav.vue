@@ -3,7 +3,9 @@
   <div class="content">
     <!-- tab -->
     <div class="tab-header">
-      <span>＜</span>
+      <!-- <span>＜</span> -->
+
+      <span class="iconfont return">&#xe62a;</span>
       <div class="tabs" v-if="showType === 'tab'">
         <div
           class="tab"
@@ -11,13 +13,15 @@
           v-for="(item, index) in navList"
           :key="index"
           @click="changemodal(item.type)"
-        >
-          {{ item.name }}
-        </div>
+        >{{ item.name }}</div>
       </div>
       <!-- 倒计时 -->
       <div class="time" v-if="showType === 'time'">
-        @ 倒计时44:29
+        <!-- 开始 -->
+        <span class="iconfont countdown" v-if="countdownType">&#xe615;</span>
+        <!-- 暂停 -->
+        <span class="iconfont countdown" v-if="!countdownType">&#xe67a;</span>
+        倒计时44:29
       </div>
       <span>设置</span>
     </div>
@@ -31,6 +35,7 @@
 export default {
   data() {
     return {
+      countdownType: true, // 倒计时状态
       navList: [
         {
           name: "答题模式",
@@ -74,6 +79,9 @@ export default {
   padding: 0 0.2rem;
   font-size: 14px;
   border-bottom: 1px solid #f0f0f0;
+  .return {
+    color: #4b4b4b;
+  }
   .tabs {
     display: flex;
     flex-wrap: nowrap;
@@ -86,6 +94,16 @@ export default {
     .active {
       background-color: #1b82d1;
       color: #f7f7f9;
+    }
+  }
+  .time {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    .countdown {
+      font-size: 0.24rem;
+        margin-right: 4px;
     }
   }
 }

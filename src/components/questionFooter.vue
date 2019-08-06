@@ -4,28 +4,34 @@
     <div class="question_bottom">
       <div class="option left">
         <div class="submit f-c-2AC782" v-if="submit === true">
-          🆚 交卷
+          <span class="iconfont f-c-2AC782">&#xe614;</span>
+          交卷
         </div>
         <div class="del" v-if="del === true">
-          🚮 移除
+          <span class="iconfont">&#xe606;</span>
+          移除
         </div>
+
         <div class="uncollected" v-if="uncollected === true">
-          ⭐️ 收藏
+          <span class="iconfont">&#xe616;</span>
+          收藏
         </div>
         <div class="collected" v-if="collected === true">
-          ⭐️ 已收藏
+          <span class="iconfont">&#xe654;</span>
+          已收藏
         </div>
       </div>
       <div class="option right">
         <div class="correct f-c-2AC782">
-          √ 1
-        </div>
+          <span class="iconfont f-s-12 f-c-2AC782">&#xe634;</span>
+           1</div>
         <div class="error f-c-FB6E52">
-          X 1
-        </div>
+          <span class="iconfont f-s-12 f-c-FB6E52">&#xe61b;</span>
+           1</div>
         <div class="menu" @click="lookMenu">
-          口 1/22
-        </div>
+          <span class="iconfont ">&#xe685;</span>
+          
+           1/22</div>
       </div>
     </div>
     <div class="questionlist" v-if="showOrHideMenu === true">
@@ -65,7 +71,7 @@
 export default {
   data() {
     return {
-      showOrHideMenu:false
+      showOrHideMenu: false
     };
   },
   props: {
@@ -87,14 +93,13 @@ export default {
     }
   },
   methods: {
-    lookMenu(){
+    lookMenu() {
       let self = this;
-      if(self.showOrHideMenu == true){
+      if (self.showOrHideMenu == true) {
         self.showOrHideMenu = false;
-      }else{
+      } else {
         self.showOrHideMenu = true;
       }
-      
     }
   }
 };
@@ -129,11 +134,14 @@ export default {
 .f-c-FB6E52 {
   color: #fb6e52;
 }
+.f-s-12{
+  font-size: .24rem;
+}
 .questionlist {
   width: 100%;
   min-height: 75vh;
   background-color: #fff;
-  ul{
+  ul {
     width: 100%;
     max-height: 75vh;
     overflow-x: hidden;
@@ -142,28 +150,28 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    li{
+    li {
       width: 16.6%;
       margin-bottom: 10px;
       display: flex;
       justify-content: center;
-      .item{
+      .item {
         width: 0.8rem;
         height: 0.8rem;
         line-height: 0.8rem;
         border-radius: 0.8rem;
         text-align: center;
-        border: 1px solid #B5B5B5;
+        border: 1px solid #b5b5b5;
         color: #666666;
       }
-      .yes{
-        background-color: #24C27D;
-        border: 1px solid #24C27D;
+      .yes {
+        background-color: #24c27d;
+        border: 1px solid #24c27d;
         color: #fff;
       }
-      .no{
-        background-color: #FB6E52;
-        border: 1px solid #FB6E52;
+      .no {
+        background-color: #fb6e52;
+        border: 1px solid #fb6e52;
         color: #fff;
       }
     }
