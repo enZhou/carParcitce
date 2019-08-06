@@ -105,6 +105,12 @@ const router = new Router({
             name: 'mockExam',
             component: () => import('../views/questionBank/mockExam.vue'),
         },
+        // 模拟考试-成绩
+        {
+            path: '/examScores',
+            name: 'examScores',
+            component: () => import('../views/questionBank/examScores.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
