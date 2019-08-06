@@ -99,6 +99,12 @@ const router = new Router({
             name: 'errorQuestion',
             component: () => import('../views/questionBank/errorQuestion.vue'),
         },
+        // 模拟考试
+        {
+            path: '/mockExam',
+            name: 'mockExam',
+            component: () => import('../views/questionBank/mockExam.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {

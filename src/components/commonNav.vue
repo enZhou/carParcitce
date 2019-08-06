@@ -15,12 +15,13 @@
           {{ item.name }}
         </div>
       </div>
+      <!-- 倒计时 -->
       <div class="time" v-if="showType === 'time'">
         @ 倒计时44:29
       </div>
       <span>设置</span>
     </div>
-    <!-- 内容  -->
+    <!-- tab内容  -->
     <div class="tab-body" v-if="showType === 'tab'">
       <slot name="content"></slot>
     </div>
@@ -43,10 +44,12 @@ export default {
     };
   },
   props: {
+    // tab答题背题模式默认为答题模式
     active: {
       type: String,
       default: "answer"
     },
+    // tab：tab切换，time：倒计时显示
     showType: {
       type: String,
       required: true,

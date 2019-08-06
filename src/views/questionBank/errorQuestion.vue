@@ -1,16 +1,18 @@
 <!-- 我的错题 -->
 <template>
   <div>
+    <!-- tab切换操作 -->
     <commonNav :active="active" :showType="showType" @changeModal="changeType">
       <template slot="content">
         <div v-show="active === 'answer'">
-          <answer-question></answer-question>
+          <question :info='false'></question>
           <!-- 底部操作等 -->
-          <questionFooter :del="true" :uncollected="true"></questionFooter>
+          <question-footer :del="true" :uncollected="true"></question-footer>
         </div>
         <div v-show="active === 'recite'">
-          <recite-question></recite-question>
-          <questionFooter :del="true" :uncollected="true"></questionFooter>
+          <question :info='true'></question>
+          <!-- 底部操作 -->
+          <question-footer :del="true" :uncollected="true"></question-footer>
         </div>
       </template>
     </commonNav>
@@ -19,14 +21,12 @@
 <script>
 import commonNav from "../../components/commonNav.vue";
 import questionFooter from "../../components/questionFooter.vue";
-import answerQuestion from "../../components/answerQuestion.vue";
-import reciteQuestion from "../../components/reciteQuestion.vue";
+import Question from "../../components/question.vue";
 export default {
   components: {
     commonNav,
     questionFooter,
-    answerQuestion,
-    reciteQuestion
+    Question
   },
   data() {
     return {
@@ -43,8 +43,3 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped>
-
-
-</style>
-

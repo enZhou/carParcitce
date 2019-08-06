@@ -2,7 +2,7 @@
 <template>
   <div class="question_bottom">
     <div class="option left">
-      <div class="submit" v-if="submit === true">
+      <div class="submit f-c-2AC782" v-if="submit === true">
         🆚 交卷
       </div>
       <div class="del" v-if="del === true">
@@ -16,10 +16,10 @@
       </div>
     </div>
     <div class="option right">
-      <div class="correct">
+      <div class="correct f-c-2AC782">
         √ 1
       </div>
-      <div class="error">
+      <div class="error f-c-FB6E52">
         X 1
       </div>
       <div class="menu">
@@ -74,5 +74,11 @@ export default {
     justify-content: space-between;
     align-items: center;
   }
+}
+.f-c-2AC782{
+  color: #2AC782;
+}
+.f-c-FB6E52{
+  color: #FB6E52;
 }
 </style>
