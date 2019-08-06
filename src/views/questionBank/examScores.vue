@@ -6,7 +6,8 @@
     </div>
     <div class="content">
       <div class="nav">
-        <span>＜</span>
+
+        <span class="iconfont">&#xe677;</span>
         <span>本次成绩</span>
       </div>
       <div class="scoreBox">
@@ -95,7 +96,7 @@ export default {
       text-align: center;
       line-height: 0.5rem;
       padding-bottom: 1rem;
-      margin-top: 3rem;
+      margin-top: 2.02rem;
 
       // 头像
       .header_img {
@@ -106,8 +107,8 @@ export default {
         margin-bottom: 0.4rem;
       }
       .m-30 {
-        margin-top: 0.6rem;
-        margin-bottom: 0.6rem;
+        margin: 0.6rem 0;
+        // margin-bottom: 0.6rem;
       }
       .bold_font {
         color: #0f0f0f;
