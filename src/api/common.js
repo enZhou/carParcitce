@@ -125,8 +125,8 @@ export default {
         return axiosPost(`index/updateUserInfo`, trainerInfo);
     },
     // 驾考题库首页数据
-    getDrivingMain(id) {
-        return axiosGet(`driving/main?user_id=${id}`);
+    getDrivingMain(id,type) {
+        return axiosGet(`driving/main?user_id=${id}&type=${type}`);
     }
 
 

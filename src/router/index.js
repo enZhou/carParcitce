@@ -123,6 +123,12 @@ const router = new Router({
             name: 'questionOrder',
             component: () => import('../views/questionBank/questionOrder.vue'),
         },
+        // 顺序练题
+        {
+            path: '/specialPractice',
+            name: 'questionOrder',
+            component: () => import('../views/questionBank/specialPractice.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {

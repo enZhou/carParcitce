@@ -13,27 +13,28 @@
           <span :class="bankType===1?'active':''">科目四</span>
         </div>
       </div>
-      <div class="cnt_body_one" v-if="bankType==0">
+      <div class="cnt_body_one">
+        <!-- v-if="bankType==0" -->
         <!-- 驾驶证类型 -->
         <p class="one_driverLicense_type">驾驶证类型</p>
         <div class="dlType_box">
-          <div class="dlType_item" :class="dlType===0?'active':''" @click="changeDlType(0)">
+          <div class="dlType_item" :class="dlType===1?'active':''" @click="changeDlType(1)">
             <div class="item_Car_img">
-              <img src="../../assets/img/smallcar.png" alt srcset />
+              <img src="../../assets/img/car_type_c.png" alt srcset />
             </div>
             <p>小车</p>
             <p>C1/C2/C3</p>
           </div>
-          <div class="dlType_item" :class="dlType===1?'active':''" @click="changeDlType(1)">
+          <div class="dlType_item" :class="dlType===2?'active':''" @click="changeDlType(2)">
             <div class="item_Car_img">
-              <img src="../../assets/img/smallcar.png" alt srcset />
+              <img src="../../assets/img/car_type_zc.png" alt srcset />
             </div>
             <p>货车</p>
             <p>A2/B3</p>
           </div>
-          <div class="dlType_item" :class="dlType===2?'active':''" @click="changeDlType(2)">
+          <div class="dlType_item" :class="dlType===3?'active':''" @click="changeDlType(3)">
             <div class="item_Car_img">
-              <img src="../../assets/img/smallcar.png" alt srcset />
+              <img src="../../assets/img/car_type_zb.png" alt srcset />
             </div>
             <p>客车</p>
             <p>A1/A3/B1</p>
@@ -46,7 +47,7 @@
             <!-- 我的错题 -->
             <router-link class="errorTipic" :to="'/errorQuestion'">
               <div class="error_img">
-                <img src="../../assets/img/smallcar.png" alt srcset />
+                <img src="../../assets/img/myError.png" alt srcset />
               </div>
               <p>我的错题</p>
             </router-link>
@@ -88,10 +89,10 @@
             </div>
 
             <!-- 专项练习 -->
-            <router-link class="topicsPecial_box" :to="'/errorQuestion'">
+            <router-link class="topicsPecial_box" :to="'/specialPractice'">
               <!-- <div class="topicsPecial_box"> -->
               <div class="pecial_img">
-                <img src="../../assets/img/smallcar.png" alt srcset />
+                <img src="../../assets/img/myPractice.png" alt srcset />
               </div>
               <p>专项练习</p>
               <!-- </div> -->
@@ -102,7 +103,7 @@
             <!-- 我的错题 -->
             <router-link class="errorTipic" :to="'/errorQuestion'">
               <div class="error_img">
-                <img src="../../assets/img/smallcar.png" alt srcset />
+                <img src="../../assets/img/myCollect.png" alt srcset />
               </div>
               <p>我的收藏</p>
             </router-link>
@@ -151,7 +152,7 @@
           </div>
         </div>
       </div>
-      <div class="cnt_body_four" v-if="bankType==1">科目四</div>
+      <!-- <div class="cnt_body_four" v-if="bankType==1">科目四</div> -->
     </div>
 
     <stuFooter></stuFooter>
@@ -167,7 +168,7 @@ export default {
     return {
       title: "驾考题库",
       bankType: 0, //科目类型
-      dlType: 0, // 驾驶证类型
+      dlType: 1, // 驾驶证类型
       showType: "tab",
       practiceData: {}, // 首页总数据
       dlData: {
@@ -196,27 +197,38 @@ export default {
       let vm = this;
       vm.bankType = val;
       vm.getMainData(vm.userInfo.user_id);
+      if(val ===1){
+        vm.dlType = 1;
+      }
     },
     // 选择驾驶证类型
     changeDlType(val) {
       const vm = this;
+      if(vm.bankType == 1){
+        return
+      }
       vm.dlType = val;
-      vm.setMainData(val);
+      vm.getMainData(vm.userInfo.user_id);
     },
     /**
      * { number } 用户id
      */
     getMainData(id) {
       const vm = this;
-      api.getDrivingMain(id).then(res => {
-        vm.practiceData = res;
-        vm.setMainData(vm.dlType);
+      let type = null;
+      if (vm.bankType === 0) {
+        type = vm.dlType;
+      } else if (vm.bankType === 1) {
+        type = 4;
+      }
+      api.getDrivingMain(id, type).then(res => {
+        vm.dlData = res;
       });
     },
     /**
-     * { number } 驾驶证类型
+     * { number } (科目一)驾驶证类型
      */
-    setMainData(type) {
+    setMainData(bankType, dlType) {
       const vm = this;
       if (Object.keys(vm.practiceData).length <= 0) {
         vm.dlData = {
@@ -225,20 +237,24 @@ export default {
           read_count: null,
           score: null
         };
-        return false
+        return false;
       }
-      switch (type) {
-        case 0:
-          vm.dlData = vm.practiceData.small_car;
-          break;
-        case 1:
-          vm.dlData = vm.practiceData.goods_car;
-          break;
-        case 2:
-          vm.dlData = vm.practiceData.passenger_car;
-          break;
-        default:
-          vm.dlData = vm.practiceData.small_car;
+      if (bankType == 0) {
+        switch (dlType) {
+          case 1:
+            vm.dlData = vm.practiceData.small_car;
+            break;
+          case 2:
+            vm.dlData = vm.practiceData.goods_car;
+            break;
+          case 3:
+            vm.dlData = vm.practiceData.passenger_car;
+            break;
+          default:
+            vm.dlData = vm.practiceData.small_car;
+        }
+      } else if (bankType == 1) {
+        vm.dlData = vm.practiceData.subject_four;
       }
     }
   }
@@ -354,11 +370,11 @@ export default {
             flex-direction: column;
             justify-content: space-evenly;
             align-items: center;
-            height: 1.8rem;
+            height: 1.6rem;
             width: 1rem;
             .error_img,
             .pecial_img {
-              width: 0.8rem;
+              width: 0.7rem;
             }
             p {
               font-size: 0.24rem;

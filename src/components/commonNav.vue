@@ -5,7 +5,7 @@
     <div class="tab-header">
       <!-- <span>＜</span> -->
 
-      <span class="iconfont return">&#xe62a;</span>
+      <span class="iconfont return" @click="$router.back(-1)">&#xe62a;</span>
       <div class="tabs" v-if="showType === 'tab'">
         <div
           class="tab"
@@ -23,7 +23,12 @@
         <span class="iconfont countdown" v-if="!countdownType">&#xe67a;</span>
         倒计时44:29
       </div>
-      <span>设置</span>
+      <div class="txt" v-if="showType ==='txt'">
+        <slot name="txt"></slot>
+      </div>
+      <div>
+        <span v-if="showSetting">设置</span>
+      </div>
     </div>
     <!-- tab内容  -->
     <div class="tab-body" v-if="showType === 'tab'">
@@ -59,6 +64,10 @@ export default {
       type: String,
       required: true,
       default: ""
+    },
+    showSetting: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
@@ -103,7 +112,7 @@ export default {
     align-items: center;
     .countdown {
       font-size: 0.24rem;
-        margin-right: 4px;
+      margin-right: 4px;
     }
   }
 }
