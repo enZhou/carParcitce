@@ -1,9 +1,9 @@
 <template>
   <!-- 专项练习 -->
   <div class="specialPractice">
-    <commonNav :showType="'txt'" :showSetting="false">
+    <commonPage :showType="'txt'" :showSetting="false">
       <span slot="txt" class="title">专项练习</span>
-    </commonNav>
+    </commonPage>
     <div class="_cnt">
       <div class="_cnt-item" v-for="(value,key,index) in practiceList" :key="index+1">
         <div class="_cnt-item-left">
@@ -30,9 +30,9 @@
   </div>
 </template>
 <script>
-import commonNav from "../../components/commonNav.vue";
+import commonPage from "../../components/commonPage.vue";
 export default {
-  components: { commonNav },
+  components: { commonPage },
   data() {
     return {
       practiceList: {

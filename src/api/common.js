@@ -127,6 +127,10 @@ export default {
     // 驾考题库首页数据
     getDrivingMain(id,type) {
         return axiosGet(`driving/main?user_id=${id}&type=${type}`);
+    },
+    // 驾考题库首页数据
+    getDrivingOrder(id,type) {
+        return axiosGet(`driving/order?user_id=${id}&type=${type}`);
     }
 
 

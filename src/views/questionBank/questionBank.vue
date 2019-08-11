@@ -45,7 +45,7 @@
           <!-- 顺序练习 -->
           <div class="practice_box">
             <!-- 我的错题 -->
-            <router-link class="errorTipic" :to="'/errorQuestion'">
+            <router-link class="errorTipic" :to="'/errorQuestion/?type='+getDataType">
               <div class="error_img">
                 <img src="../../assets/img/myError.png" alt srcset />
               </div>
@@ -101,7 +101,7 @@
           <!-- 模拟考试 -->
           <div class="exam_box">
             <!-- 我的错题 -->
-            <router-link class="errorTipic" :to="'/errorQuestion'">
+            <router-link class="errorTipic" :to="'/questionCollect'">
               <div class="error_img">
                 <img src="../../assets/img/myCollect.png" alt srcset />
               </div>
@@ -177,7 +177,8 @@ export default {
         read_count: null,
         score: null
       }, // 驾驶证数据
-      userInfo: null // 用户信息
+      userInfo: null, // 用户信息
+      getDataType:null, // 请求类型type
     };
   },
   async created() {
@@ -221,6 +222,7 @@ export default {
       } else if (vm.bankType === 1) {
         type = 4;
       }
+      vm.getDataType = type;
       api.getDrivingMain(id, type).then(res => {
         vm.dlData = res;
       });

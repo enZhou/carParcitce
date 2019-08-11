@@ -3,8 +3,6 @@
   <div class="content">
     <!-- tab -->
     <div class="tab-header">
-      <!-- <span>＜</span> -->
-
       <span class="iconfont return" @click="$router.back(-1)">&#xe62a;</span>
       <div class="tabs" v-if="showType === 'tab'">
         <div
@@ -79,40 +77,42 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.tab-header {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  height: 1rem;
-  padding: 0 0.2rem;
-  font-size: 14px;
-  border-bottom: 1px solid #f0f0f0;
-  .return {
-    color: #4b4b4b;
-  }
-  .tabs {
-    display: flex;
-    flex-wrap: nowrap;
-    border-radius: 0.1rem;
-    overflow: hidden;
-    .tab {
-      padding: 0.1rem 0.2rem;
-      background-color: #f1f1f1;
-    }
-    .active {
-      background-color: #1b82d1;
-      color: #f7f7f9;
-    }
-  }
-  .time {
+.content {
+  .tab-header {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    .countdown {
-      font-size: 0.24rem;
-      margin-right: 4px;
+    height: 1rem;
+    padding: 0 0.2rem;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    .return {
+      color: #4b4b4b;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: nowrap;
+      border-radius: 0.1rem;
+      overflow: hidden;
+      .tab {
+        padding: 0.1rem 0.2rem;
+        background-color: #f1f1f1;
+      }
+      .active {
+        background-color: #1b82d1;
+        color: #f7f7f9;
+      }
+    }
+    .time {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
+      .countdown {
+        font-size: 0.24rem;
+        margin-right: 4px;
+      }
     }
   }
 }

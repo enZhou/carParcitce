@@ -2,7 +2,7 @@
 <template>
   <div>
     <!-- tab切换操作 -->
-    <commonNav :active="active" :showType="showType" @changeModal="changeType">
+    <commonPage :active="active" :showType="showType" @changeModal="changeType">
       <template slot="content">
         <div v-show="active === 'answer'">
           <question :info='false'></question>
@@ -15,16 +15,16 @@
           <question-footer :del="true"></question-footer>
         </div>
       </template>
-    </commonNav>
+    </commonPage>
   </div>
 </template>
 <script>
-import commonNav from "../../components/commonNav.vue";
+import commonPage from "../../components/commonPage.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
 export default {
   components: {
-    commonNav,
+    commonPage,
     questionFooter,
     Question
   },

@@ -9,12 +9,12 @@
   </div>
 </template>
 <script>
-import commonNav from "../../components/commonNav.vue";
+import commonPage from "../../components/commonPage.vue";
 import Question from "../../components/question.vue";
 import questionFooter from "../../components/questionFooter.vue";
 export default {
   components: {
-    commonNav,
+    commonPage,
     Question,
     questionFooter
   },
