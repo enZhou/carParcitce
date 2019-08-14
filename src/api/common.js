@@ -128,9 +128,16 @@ export default {
     getDrivingMain(id,type) {
         return axiosGet(`driving/main?user_id=${id}&type=${type}`);
     },
-    // 驾考题库首页数据
+    // 驾考题库 答题背题
     getDrivingOrder(id,type) {
         return axiosGet(`driving/order?user_id=${id}&type=${type}`);
+    },
+    // 驾考题库 答题背题
+    // getDrivingRead(info) {
+    //     return axiosPost(`driving/read`,info);
+    // }
+    getDrivingRead(id,type,question_id,read_count) {
+        return axiosGet(`driving/read?user_id=${id}&type=${type}&question_id=${question_id}&read_count=${read_count}`);
     }
 
 

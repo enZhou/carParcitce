@@ -13,20 +13,19 @@
             @touchend="boxTouchEnd"
           >
             <li class="question-item" v-for="(item,index) in pageDataList" :key="index">
-              {{
-              index
-              }}
               <question
                 v-if="active === 'answer' && showQuestion"
                 :currentData="item"
                 :info="false"
                 ref="question"
+                @driveimgRead='driveimgRead'
               ></question>
               <question
                 v-if="active === 'recite' && showQuestion"
                 :currentData="item"
                 :info="true"
                 ref="question"
+                @driveimgRead='driveimgRead'
               ></question>
             </li>
             <!-- <li class="question-item">
@@ -57,9 +56,8 @@ import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
-import { setTimeout } from 'timers';
 var INDEX = 0;
-var PAGENUM = 100; // 每页条数
+var PAGENUM = 10; // 每页条数
 export default {
   components: {
     commonPage,
@@ -102,9 +100,9 @@ export default {
             vm.topicArr1 = data1;
             vm.showItem = true;
             vm.showQuestion = true;
-            setTimeout(()=>{
+            setTimeout(() => {
               vm.initSlide();
-            },20)
+            }, 20);
           });
         });
     }
@@ -172,8 +170,8 @@ export default {
     // 滑动结束
     boxTouchEnd(e) {
       const vm = this;
-      if(Math.abs(vm.moveX) <=1){
-        return false
+      if (Math.abs(vm.moveX) <= 1) {
+        return false;
       }
       vm.moveDir = vm.moveX < 0 ? true : false; //滑动方向大于0表示向左滑动，小于0表示向右滑动
       if (Math.abs(vm.moveX) < vm.minMoveX) {
@@ -212,7 +210,7 @@ export default {
         }
       }
     },
-
+    // 设置分页数据
     setPageData(index) {
       const vm = this;
       INDEX = index;
@@ -223,6 +221,21 @@ export default {
       }
       vm.pageDataList = pagingArr;
       console.error(pagingArr);
+    },
+    // 保存阅读位置
+    driveimgRead(questionId) {
+      const vm = this;
+      console.log(vm.$route.query)
+      let params = {
+        user_id: vm.userInfo.user_id,
+        type: vm.$route.query.type,
+        question_id: questionId,
+        read_count: parseFloat(vm.$route.query.readCount)
+      };
+      console.log(params)
+      api.getDrivingRead(params).then(res => {
+        console.error(res);
+      });
     }
   }
 };
