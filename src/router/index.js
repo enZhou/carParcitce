@@ -123,10 +123,10 @@ const router = new Router({
             name: 'questionOrder',
             component: () => import('../views/questionBank/questionOrder.vue'),
         },
-        // 顺序练题
+        // 专项练题
         {
             path: '/specialPractice',
-            name: 'questionOrder',
+            name: 'specialPractice',
             component: () => import('../views/questionBank/specialPractice.vue'),
         },
     ],

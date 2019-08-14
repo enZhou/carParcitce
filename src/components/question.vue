@@ -2,14 +2,11 @@
 <template>
   <div class="question_box">
     <div class="question_title">
-      <span v-if="currentData.item3!=null">单选</span>
-      <span v-if="!currentData.item3||currentData.item3==null">判断</span>
-      <span v-if="false">多选</span>
+      <span class="_titleType" v-if="currentData.item3!=''">单选</span>
+      <span class="_titleType" v-if="!currentData.item3||currentData.item3==''">判断</span>
+      <span class="_titleType" v-if="false">多选</span>
       <span>{{currentData.question}}</span>
     </div>
-    {{
-    currentData.url
-    }}
     <img :src="currentData.url || ''" alt />
     <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption(1)">
@@ -19,7 +16,7 @@
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
-          v-else-if="currentData.answer !== 1 && answer ==1"
+          v-else-if="currentData.answer !== 1 && answer ==1 && showErr"
         ></span>
         <div class="option" v-else>
           <span>A</span>
@@ -33,7 +30,7 @@
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
-          v-else-if="currentData.answer !== 2 && answer ==2"
+          v-else-if="currentData.answer !== 2 && answer ==2 && showErr"
         ></span>
         <div class="option" v-else>B</div>
         <span>{{currentData.item2}}</span>
@@ -45,7 +42,7 @@
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
-          v-else-if="currentData.answer !== 3 && answer ==3"
+          v-else-if="currentData.answer !== 3 && answer ==3 && showErr"
         ></span>
         <div class="option" v-else>C</div>
         <span>{{currentData.item3}}</span>
@@ -57,7 +54,7 @@
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
-          v-else-if="currentData.answer !== 4 && answer ==4"
+          v-else-if="currentData.answer !== 4 && answer ==4 && showErr"
         ></span>
         <div class="option" v-else>D</div>
         <span>{{currentData.item4}}</span>
@@ -73,12 +70,16 @@
   </div>
 </template>
 <script>
+import api from "../api/common.js";
+import { getStore } from "../common/util.js";
 export default {
   data() {
     return {
       answer: null,
       answerType: false,
-      isInfo: false
+      isInfo: false,
+      showErr: false, // 是否显示错误答案
+      userInfo: null
     };
   },
   props: {
@@ -102,6 +103,10 @@ export default {
       }
     }
   },
+  mounted() {
+    const vm = this;
+    vm.userInfo = JSON.parse(getStore("loginInfo"));
+  },
   methods: {
     chooseOption(answer) {
       const vm = this;
@@ -111,14 +116,11 @@ export default {
       vm.answerType = true;
       vm.answer = answer;
       vm.isInfo = true;
-      let currentBox = vm.getDocement("option")[answer - 1];
-      if (answer !== vm.currentData.answer) {
-        currentBox.classList.add("activeErr");
-      }
+      vm.showErr = true;
+      vm.$emit('driveimgRead',vm.currentData.id);
     },
     getDocement(className) {
-      let div = document.getElementsByClassName("question_box")[0];
-      return div.getElementsByClassName(className);
+      return document.querySelectorAll(`.${className}`);
     },
     // 每次答题完成恢复默认
     resetType() {
@@ -126,16 +128,26 @@ export default {
       vm.answer = null;
       vm.answerType = false;
       vm.isInfo = false;
-      console.log(1231232)
     }
   },
   watch: {
     info(val, oldVal) {
       const vm = this;
-      if (vm.answerType) {
-        return;
+      vm.isInfo = val;
+      if (!vm.answer) {
+        if (val) {
+          vm.answerType = true;
+        } else {
+          vm.answerType = false;
+        }
       } else {
-        vm.isInfo = val;
+        if (val) {
+          vm.answerType = true;
+          vm.showErr = false;
+        } else {
+          vm.answerType = false;
+          vm.chooseOption(vm.answer);
+        }
       }
     }
   }
@@ -149,6 +161,14 @@ export default {
     display: block;
     margin: 0 auto;
     max-width: 100%;
+  }
+  ._titleType {
+    font-size: 0.2rem;
+    padding: 3px;
+    background: rgba(251, 110, 82, 1);
+    border-radius: 8px 8px 0 8px;
+    color: #fff;
+    margin-right: 3px;
   }
 }
 .option_box {

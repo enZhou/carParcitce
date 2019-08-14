@@ -45,7 +45,7 @@
           <!-- 顺序练习 -->
           <div class="practice_box">
             <!-- 我的错题 -->
-            <router-link class="errorTipic" :to="'/errorQuestion/?type='+getDataType">
+            <router-link class="errorTipic" :to="'/errorQuestion/?type='+getDataType+'&readCount='+dlData.read_count">
               <div class="error_img">
                 <img src="../../assets/img/myError.png" alt srcset />
               </div>
@@ -80,7 +80,7 @@
                 <li></li>
                 <li></li>
               </ul>
-              <router-link class="tipic_round" :to="'/errorQuestion'">
+              <router-link class="tipic_round" :to="'/questionOrder/?type='+getDataType+'&readCount='+dlData.read_count">
                 <div class="tipic_round_green">
                   <p>顺序练习</p>
                   <p>{{dlData.read_count || 0}}/{{dlData.total_count || 0}}</p>
