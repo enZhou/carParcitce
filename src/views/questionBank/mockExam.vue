@@ -1,7 +1,7 @@
 <!-- 模拟考试 -->
 <template>
   <div>
-    <common-nav :showType="showType"></common-nav>
+    <common-page :showType="showType"></common-page>
     <!-- 题目 -->
     <question :info="true"></question>
     <!-- 底部操作 -->
