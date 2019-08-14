@@ -1,9 +1,7 @@
 <!-- 模拟考试 -->
 <template>
   <div>
-    
     <commonPage :showType="showType"></commonPage>
-    <span @click="showDialog">测试</span>
     <div class="question-content">
       <ul
         class="question-ul"
@@ -16,8 +14,9 @@
         </li>
       </ul>
     </div>
+    <!-- 底部操作 -->
+    <question-footer :submit="true" :uncollected="true" @submitClk='submitClk'></question-footer>
     <!-- 弹窗 -->
-    
     <question-dialog :is-show="isShow" 
       :title="dialogTitle" 
       :content='dialogContent'
@@ -25,8 +24,6 @@
       :okBtnName="okBtnName"
       @closeClk='close'
       @okClk='ok'></question-dialog>
-    <!-- 底部操作 -->
-    <question-footer :submit="true" :uncollected="true"></question-footer>
   </div>
 </template>
 <script>
@@ -85,14 +82,17 @@ export default {
     }
   },
   methods: {
-    showDialog:function(){
+    // 交卷弹窗事件
+    submitClk:function(){
       let self = this;
       self.isShow = true;
     },
+    // 弹窗取消
     close:function(){
       let self = this;
       self.isShow = false;
     },
+    // 弹窗确认
     ok:function(){
       let self = this;
       self.isShow = false;

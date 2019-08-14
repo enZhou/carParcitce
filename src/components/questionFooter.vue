@@ -3,11 +3,11 @@
   <div class="footer">
     <div class="question_bottom">
       <div class="option left">
-        <div class="submit f-c-2AC782" v-if="submit === true">
+        <div class="submit f-c-2AC782" v-if="submit === true" @click="submitClk">
           <span class="iconfont f-c-2AC782">&#xe614;</span>
           交卷
         </div>
-        <div class="del" v-if="del === true">
+        <div class="del" v-if="del === true" @click="delClk">
           <span class="iconfont">&#xe606;</span>
           移除
         </div>
@@ -97,6 +97,17 @@ export default {
     }
   },
   methods: {
+    // 交卷事件
+    submitClk(){
+      let self = this;
+      self.$emit('submitClk');
+    },
+    // 移除事件
+    delClk(){
+      let self = this;
+      self.$emit('delClk');
+    },
+    // 展示题目菜单
     lookMenu() {
       let self = this;
       if (self.showOrHideMenu == true) {
@@ -105,6 +116,7 @@ export default {
         self.showOrHideMenu = true;
       }
     },
+    // 点击遮罩层隐藏menu
     displayMenu() {
       let self = this;
       self.showOrHideMenu = false;
