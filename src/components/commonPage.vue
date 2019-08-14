@@ -11,7 +11,9 @@
           v-for="(item, index) in navList"
           :key="index"
           @click="changemodal(item.type)"
-        >{{ item.name }}</div>
+        >
+          {{ item.name }}
+        </div>
       </div>
       <!-- 倒计时 -->
       <div class="time" v-if="showType === 'time'">
@@ -19,9 +21,9 @@
         <span class="iconfont countdown" v-if="countdownType">&#xe615;</span>
         <!-- 暂停 -->
         <span class="iconfont countdown" v-if="!countdownType">&#xe67a;</span>
-        倒计时44:29
+        倒计时{{ times }}
       </div>
-      <div class="txt" v-if="showType ==='txt'">
+      <div class="txt" v-if="showType === 'txt'">
         <slot name="txt"></slot>
       </div>
       <div>
@@ -48,7 +50,8 @@ export default {
           name: "背题模式",
           type: "recite"
         }
-      ]
+      ],
+      times: ""
     };
   },
   props: {
@@ -68,10 +71,38 @@ export default {
       default: true
     }
   },
+  mounted() {
+    this.Countdown();
+  },
+  destroyed() {
+    this.Countdown();
+  },
   methods: {
     changemodal(type) {
       let self = this;
       self.$emit("changeModal", type);
+    },
+    Countdown() {
+      const startTime = Date.parse(new Date());
+      // 初始化倒计时
+      this.init = function() {
+        var endTime = startTime + 24 * 60 * 60 * 1000; // 结束时间
+        var timeLeft = endTime - new Date().getTime(); // 剩余时间
+
+        // 格式化时间
+        var minutes = parseInt((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = parseInt((timeLeft % (1000 * 60)) / 1000);
+        this.times =
+          (minutes < 10 ? "0" + minutes : minutes) +
+          ":" +
+          (seconds < 10 ? "0" + seconds : seconds);
+        // 轮询计算时间
+        var that = this;
+        setInterval(function() {
+          that.init();
+        }, 1000);
+      };
+      this.init();
     }
   }
 };
