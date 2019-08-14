@@ -34,7 +34,7 @@ import questionDialog from "../../components/questionDialog.vue";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
 var INDEX = 0;
-var PAGENUM = 10; // 每页条数
+var PAGENUM = 100; // 每页条数
 export default {
   components: {
     commonPage,
