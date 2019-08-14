@@ -64,8 +64,7 @@
       <div class="info_title">
         <span class="title">试题详解</span>
       </div>
-
-      <div class="info_content">{{currentData.explains}}</div>
+      <div class="info_content" v-html='currentData.explains'></div>
     </div>
   </div>
 </template>

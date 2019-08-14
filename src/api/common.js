@@ -133,12 +133,12 @@ export default {
         return axiosGet(`driving/order?user_id=${id}&type=${type}`);
     },
     // 驾考题库 答题背题
-    // getDrivingRead(info) {
-    //     return axiosPost(`driving/read`,info);
-    // }
     getDrivingRead(id,type,question_id,read_count) {
         return axiosGet(`driving/read?user_id=${id}&type=${type}&question_id=${question_id}&read_count=${read_count}`);
-    }
-
+    },
+    // 模拟考试
+    getDrivingTest(id,type) {
+        return axiosGet(`driving/test?user_id=${id}&type=${type}`);
+    },
 
 }

@@ -135,7 +135,8 @@
                 <li></li>
                 <li></li>
               </ul>
-              <router-link class="exam_round" :to="'/mockExam'">
+
+              <router-link class="exam_round" :to="'/mockExam/?type='+getDataType">
                 <div class="tipic_round_purple">
                   <p>模拟考试</p>
                   <p>{{dlData.score || 0}}</p>
