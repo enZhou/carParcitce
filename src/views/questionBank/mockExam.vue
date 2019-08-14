@@ -1,8 +1,9 @@
 <!-- 模拟考试 -->
 <template>
   <div>
+    
     <commonPage :showType="showType"></commonPage>
-
+    <span @click="showDialog">测试</span>
     <div class="question-content">
       <ul
         class="question-ul"
@@ -16,7 +17,7 @@
       </ul>
     </div>
     <!-- 弹窗 -->
-    <span @click="showDialog">测试</span>
+    
     <question-dialog :is-show="isShow" 
       :title="dialogTitle" 
       :content='dialogContent'
@@ -47,6 +48,13 @@ export default {
   data() {
     return {
       showType: "time",
+
+      isShow:false,
+      dialogTitle:'成绩不合格',
+      dialogContent:'你本次做对14道题，做错11道题 考试得分14分，考试不合格，确认',
+      closeBtnName:'继续',
+      okBtnName:'提交',
+
       dataBase: {}, // 题目
       userInfo: null, // 用户信息
       topicArr: new Object(), // 题目信息
