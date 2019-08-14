@@ -24,16 +24,20 @@
       <div class="option right">
         <div class="correct f-c-2AC782">
           <span class="iconfont f-s-12 f-c-2AC782">&#xe634;</span>
-           1</div>
+          1
+        </div>
         <div class="error f-c-FB6E52">
           <span class="iconfont f-s-12 f-c-FB6E52">&#xe61b;</span>
-           1</div>
+          1
+        </div>
         <div class="menu" @click="lookMenu">
           <span class="iconfont ">&#xe685;</span>
-          
-           1/22</div>
+
+          1/22
+        </div>
       </div>
     </div>
+    <div class="mask" v-if="showOrHideMenu === true" @click="displayMenu"></div>
     <div class="questionlist" v-if="showOrHideMenu === true">
       <ul>
         <li>
@@ -100,6 +104,10 @@ export default {
       } else {
         self.showOrHideMenu = true;
       }
+    },
+    displayMenu() {
+      let self = this;
+      self.showOrHideMenu = false;
     }
   }
 };
@@ -134,8 +142,17 @@ export default {
 .f-c-FB6E52 {
   color: #fb6e52;
 }
-.f-s-12{
-  font-size: .24rem;
+.f-s-12 {
+  font-size: 0.24rem;
+}
+.mask {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 .questionlist {
   width: 100%;
