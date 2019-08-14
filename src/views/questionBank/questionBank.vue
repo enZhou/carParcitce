@@ -135,12 +135,13 @@
                 <li></li>
                 <li></li>
               </ul>
-              <div class="exam_round">
+
+              <router-link class="exam_round" :to="'/mockExam/?type='+getDataType">
                 <div class="tipic_round_purple">
                   <p>模拟考试</p>
                   <p>{{dlData.score || 0}}</p>
                 </div>
-              </div>
+              </router-link>
             </div>
             <!-- 专项练习 -->
             <div class="topicsPecial_box">

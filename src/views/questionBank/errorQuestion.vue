@@ -97,7 +97,6 @@ export default {
           vm.dataBase = res;
           vm.setCurrentData(res.list, res.last_read_id, (data, data1) => {
             vm.topicArr = data;
-            vm.topicArr1 = data1;
             vm.showItem = true;
             vm.showQuestion = true;
             setTimeout(() => {
@@ -106,9 +105,6 @@ export default {
           });
         });
     }
-  },
-  mounted() {
-    const vm = this;
   },
   methods: {
     //选择模式
@@ -253,10 +249,6 @@ export default {
     height: 100%;
     .question-item {
       min-width: 375px;
-      // float: left;
-      // position: relative;
-      // // width: 100%;
-      // height: 100%;
     }
   }
 }
