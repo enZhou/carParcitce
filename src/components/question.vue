@@ -7,7 +7,14 @@
       <span class="_titleType" v-if="false">多选</span>
       <span>{{currentData.question}}</span>
     </div>
-    <img :src="currentData.url || ''" alt />
+    <img v-if="currentData.url&&judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
+    
+    <object v-if="currentData.url&&!judgeSwfFiles(currentData.url)" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" :codebase="currentData.url">
+        <param name="SRC" :value="currentData.url">
+        <embed :src="currentData.url" >
+    </object>
+
+  
     <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption(1)">
         <span
@@ -127,6 +134,13 @@ export default {
       vm.answer = null;
       vm.answerType = false;
       vm.isInfo = false;
+    },
+    judgeSwfFiles(file){
+      if(file.indexOf('.swf') == 0){
+        return true
+      }else{
+        return false
+      }
     }
   },
   watch: {

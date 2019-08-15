@@ -43,7 +43,7 @@ import Question from "../../components/question.vue";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
 var INDEX = 0;
-var PAGENUM = 10; // 每页条数
+var PAGENUM = 100; // 每页条数
 export default {
   components: {
     commonPage,
@@ -59,8 +59,6 @@ export default {
       dataBase: {}, // 题目
       pageDataList: [], // 分页过后的数据
       userInfo: null, // 用户信息
-      topicArr: new Object(), // 题目信息
-      topicArr1: new Object(), // 题目信息
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
@@ -70,27 +68,29 @@ export default {
       moveDir: null, // 滑动方向
       nodeWidth: null, // 滑块宽度
       startX: null, // 触摸的坐标
-      itemLength: 0 // item个数ï
+      itemLength: 0, // item个数ï
+      setCurrentTimeOut: null
     };
   },
   async created() {
     const vm = this;
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (Object.keys(vm.$route.query).length > 0) {
-      api
-        .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
-        .then(res => {
-          vm.dataBase = res;
-          vm.setCurrentData(res.list, res.last_read_id, (data, data1) => {
-            vm.topicArr = data;
-            vm.topicArr1 = data1;
-            vm.showItem = true;
-            vm.showQuestion = true;
-            setTimeout(() => {
+      if (Object.keys(vm.dataBase).length <= 0) {
+        api
+          .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
+          .then(res => {
+            vm.dataBase = res;
+            vm.setCurrentData(res.list, res.last_read_id, data => {
+              vm.pageDataList = data;
+              vm.showItem = true;
+              vm.showQuestion = true;
               vm.initSlide();
-            }, 20);
+            });
           });
-        });
+      } else {
+        vm.initSlide();
+      }
     }
   },
   mounted() {
@@ -105,18 +105,20 @@ export default {
     // 处理数据
     setCurrentData(total, readId, callback) {
       const vm = this;
-      let currentData = {};
+      let lock = true;
       total.forEach((element, index) => {
         if (element.id === readId + "") {
-          vm.setPageData(index);
-          currentData = element;
+          lock = false;
+          vm.setPageData(index, data => {
+            callback(data);
+          });
         }
       });
-      if (!currentData.id) {
-        vm.setPageData(0);
-        currentData = total[INDEX];
+      if (lock) {
+        vm.setPageData(0, data => {
+          callback(data);
+        });
       }
-      callback(currentData);
     },
     resetModal() {
       const vm = this;
@@ -125,16 +127,20 @@ export default {
     // 初始化滑动
     initSlide() {
       const vm = this;
-      vm.movebox = document.querySelector(".question-ul"); //滑动对象
-      vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
-      vm.itemLength = PAGENUM;
-      vm.nodeWidth = parseInt(
-        window.getComputedStyle(vm.movebox.parentNode).width
-      ); //滑动对象item的宽度
-      vm.movebox.style.width = vm.nodeWidth * vm.itemLength + "px"; //设置滑动盒子width
-      for (var i = 0; i < vm.itemLength; i++) {
-        vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
-      }
+      vm.setCurrentTimeOut = setTimeout(() => {
+        clearTimeout(vm.setCurrentTimeOut);
+        console.error("初始化滑动");
+        vm.movebox = document.querySelector(".question-ul"); //滑动对象
+        vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
+        vm.itemLength = PAGENUM;
+        vm.nodeWidth = parseInt(
+          window.getComputedStyle(vm.movebox.parentNode).width
+        ); //滑动对象item的宽度
+        vm.movebox.style.width = vm.nodeWidth * vm.itemLength + "px"; //设置滑动盒子width
+        for (var i = 0; i < vm.itemLength; i++) {
+          vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
+        }
+      }, 30);
     },
     // 开始
     boxTouchStart(e) {
@@ -195,7 +201,7 @@ export default {
       }
     },
     // 设置分页数据
-    setPageData(index) {
+    setPageData(index, callback) {
       const vm = this;
       INDEX = index;
       let pagingArr = new Array();
@@ -203,7 +209,7 @@ export default {
         INDEX++;
         pagingArr.push(vm.dataBase.list[INDEX]);
       }
-      vm.pageDataList = pagingArr;
+      callback(pagingArr);
     },
     // 保存阅读位置
     driveimgRead(questionId) {
@@ -215,13 +221,12 @@ export default {
         question_id: questionId,
         read_count: parseFloat(vm.$route.query.readCount)
       };
-      console.log(params);
       api
         .getDrivingRead(
           vm.userInfo.user_id,
           vm.$route.query.type,
           questionId,
-          parseFloat(vm.$route.query.readCount)+vm.cout+1
+          parseFloat(vm.$route.query.readCount) + vm.cout + 1
         )
         .then(res => {
           console.error(res);
@@ -242,6 +247,7 @@ export default {
     flex-wrap: nowrap;
     height: 100%;
     .question-item {
+      min-width: 375px;
     }
   }
 }

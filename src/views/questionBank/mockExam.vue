@@ -15,15 +15,17 @@
       </ul>
     </div>
     <!-- 底部操作 -->
-    <question-footer :submit="true" :uncollected="true" @submitClk='submitClk'></question-footer>
+    <question-footer :submit="true" :uncollected="true" @submitClk="submitClk"></question-footer>
     <!-- 弹窗 -->
-    <question-dialog :is-show="isShow" 
-      :title="dialogTitle" 
-      :content='dialogContent'
-      :closeBtnName='closeBtnName'
+    <question-dialog
+      :is-show="isShow"
+      :title="dialogTitle"
+      :content="dialogContent"
+      :closeBtnName="closeBtnName"
       :okBtnName="okBtnName"
-      @closeClk='close'
-      @okClk='ok'></question-dialog>
+      @closeClk="close"
+      @okClk="ok"
+    ></question-dialog>
   </div>
 </template>
 <script>
@@ -45,16 +47,15 @@ export default {
   data() {
     return {
       showType: "time",
-
-      isShow:false,
-      dialogTitle:'成绩不合格',
-      dialogContent:'你本次做对14道题，做错11道题 考试得分14分，考试不合格，确认',
-      closeBtnName:'继续',
-      okBtnName:'提交',
-
+      isShow: false,
+      dialogTitle: "成绩不合格",
+      dialogContent:
+        "你本次做对14道题，做错11道题 考试得分14分，考试不合格，确认",
+      closeBtnName: "继续",
+      okBtnName: "提交",
       dataBase: {}, // 题目
       userInfo: null, // 用户信息
-      topicArr: new Object(), // 题目信息
+      topicArr: new Array(), // 题目信息
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
@@ -64,36 +65,41 @@ export default {
       moveDir: null, // 滑动方向
       nodeWidth: null, // 滑块宽度
       startX: null, // 触摸的坐标
-      itemLength: 0 // item个数ï
+      itemLength: 0, // item个数ï
+      setCurrentTimeOut: null,
     };
   },
   async created() {
     const vm = this;
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (Object.keys(vm.$route.query).length > 0) {
-      api
-        .getDrivingTest(vm.userInfo.user_id, vm.$route.query.type)
-        .then(res => {
-          vm.topicArr = res.list;
-          setTimeout(() => {
+      if (vm.topicArr.length <= 0) {
+        api
+          .getDrivingTest(vm.userInfo.user_id, vm.$route.query.type)
+          .then(res => {
+            console.error(res)
+            vm.topicArr = res.list;
             vm.initSlide();
-          }, 30);
-        });
+          });
+      } else {
+            console.error(res)
+        vm.initSlide();
+      }
     }
   },
   methods: {
     // 交卷弹窗事件
-    submitClk:function(){
+    submitClk: function() {
       let self = this;
       self.isShow = true;
     },
     // 弹窗取消
-    close:function(){
+    close: function() {
       let self = this;
       self.isShow = false;
     },
     // 弹窗确认
-    ok:function(){
+    ok: function() {
       let self = this;
       self.isShow = false;
     },
@@ -109,17 +115,19 @@ export default {
     // 初始化滑动
     initSlide() {
       const vm = this;
-      vm.movebox = document.querySelector(".question-ul"); //滑动对象
-      vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
-      // vm.itemLength = document.querySelector(".question-ul").children.length;
-      vm.itemLength = PAGENUM;
-      vm.nodeWidth = parseInt(
-        window.getComputedStyle(vm.movebox.parentNode).width
-      ); //滑动对象item的宽度
-      vm.movebox.style.width = vm.nodeWidth * (vm.itemLength - 1) + "px"; //设置滑动盒子width
-      for (var i = 0; i < vm.itemLength; i++) {
-        vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
-      }
+      vm.setCurrentTimeOut = setTimeout(() => {
+        clearTimeout(vm.setCurrentTimeOut);
+        vm.movebox = document.querySelector(".question-ul"); //滑动对象
+        vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
+        vm.itemLength = PAGENUM;
+        vm.nodeWidth = parseInt(
+          window.getComputedStyle(vm.movebox.parentNode).width
+        ); //滑动对象item的宽度
+        vm.movebox.style.width = vm.nodeWidth * (vm.itemLength) + "px"; //设置滑动盒子width
+        for (var i = 0; i < vm.itemLength; i++) {
+          vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
+        }
+      }, 30);
     },
     // 开始
     boxTouchStart(e) {

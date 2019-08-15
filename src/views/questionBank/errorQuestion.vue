@@ -18,30 +18,16 @@
                 :currentData="item"
                 :info="false"
                 ref="question"
-                @driveimgRead='driveimgRead'
+                @driveimgRead="driveimgRead"
               ></question>
               <question
                 v-if="active === 'recite' && showQuestion"
                 :currentData="item"
                 :info="true"
                 ref="question"
-                @driveimgRead='driveimgRead'
+                @driveimgRead="driveimgRead"
               ></question>
             </li>
-            <!-- <li class="question-item">
-              <question
-                v-if="active === 'answer' && showQuestion"
-                :currentData="topicArr1"
-                :info="false"
-                ref="question"
-              ></question>
-              <question
-                v-if="active === 'recite' && showQuestion"
-                :currentData="topicArr1"
-                :info="true"
-                ref="question"
-              ></question>
-            </li>-->
           </ul>
           <!-- 底部操作等 -->
           <question-footer :del="true" :uncollected="true"></question-footer>
@@ -73,8 +59,6 @@ export default {
       dataBase: {}, // 题目
       pageDataList: [], // 分页过后的数据
       userInfo: null, // 用户信息
-      topicArr: new Object(), // 题目信息
-      topicArr1: new Object(), // 题目信息
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
@@ -91,19 +75,24 @@ export default {
     const vm = this;
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (Object.keys(vm.$route.query).length > 0) {
-      api
-        .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
-        .then(res => {
-          vm.dataBase = res;
-          vm.setCurrentData(res.list, res.last_read_id, (data, data1) => {
-            vm.topicArr = data;
-            vm.showItem = true;
-            vm.showQuestion = true;
-            setTimeout(() => {
-              vm.initSlide();
-            }, 20);
+      if (Object.keys(vm.dataBase).length <= 0) {
+        api
+          .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
+          .then(res => {
+            vm.dataBase = res;
+            vm.setCurrentData(res.list, res.last_read_id, data => {
+              vm.showItem = true;
+              vm.showQuestion = true;
+              setTimeout(() => {
+                vm.initSlide();
+              }, 20);
+            });
           });
-        });
+      } else {
+        setTimeout(() => {
+          vm.initSlide();
+        }, 20);
+      }
     }
   },
   methods: {
@@ -115,18 +104,20 @@ export default {
     // 处理数据
     setCurrentData(total, readId, callback) {
       const vm = this;
-      let currentData = {};
+      let lock = true;
       total.forEach((element, index) => {
         if (element.id === readId + "") {
-          vm.setPageData(index);
-          currentData = element;
+          lock = false;
+          vm.setPageData(index, data => {
+            callback(data);
+          });
         }
       });
-      if (!currentData.id) {
-        vm.setPageData(0);
-        currentData = total[INDEX];
+      if (lock) {
+        vm.setPageData(0, data => {
+          callback(data);
+        });
       }
-      callback(currentData);
     },
     resetModal() {
       const vm = this;
@@ -187,7 +178,6 @@ export default {
       //手指向左滑动
       if (vm.moveDir) {
         if (vm.cout < vm.itemLength - 1) {
-          console.error(vm.endX, vm.nodeWidth);
           vm.movebox.style.webkitTransform =
             "translateX(" + (vm.endX - vm.nodeWidth) + "px)";
           vm.cout++;
@@ -207,7 +197,7 @@ export default {
       }
     },
     // 设置分页数据
-    setPageData(index) {
+    setPageData(index, callback) {
       const vm = this;
       INDEX = index;
       let pagingArr = new Array();
@@ -215,20 +205,19 @@ export default {
         INDEX++;
         pagingArr.push(vm.dataBase.list[INDEX]);
       }
-      vm.pageDataList = pagingArr;
-      console.error(pagingArr);
+      callback(pagingArr);
     },
     // 保存阅读位置
     driveimgRead(questionId) {
       const vm = this;
-      console.log(vm.$route.query)
+      console.log(vm.$route.query);
       let params = {
         user_id: vm.userInfo.user_id,
         type: vm.$route.query.type,
         question_id: questionId,
         read_count: parseFloat(vm.$route.query.readCount)
       };
-      console.log(params)
+      console.log(params);
       api.getDrivingRead(params).then(res => {
         console.error(res);
       });
