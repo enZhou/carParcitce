@@ -118,8 +118,6 @@ export default {
         // 轮播配置
         loop: false, // 循环滚动
         centeredSlides: true,
-        // observer: true, //修改swiper自己或子元素时，自动初始化swiper
-        // observeParents: true, //修改swiper的父元素时，自动初始化swiper
         on: {
           slideChange: () => {
             console.log($(".question-ul"));
@@ -248,13 +246,7 @@ export default {
   height: 85%;
   overflow-y: hidden;
   .question-ul {
-    // display: flex;
-    // flex-direction: row;
-    // flex-wrap: nowrap;
     height: 100%;
-    .question-item {
-      min-width: 375px;
-    }
   }
 }
 </style>

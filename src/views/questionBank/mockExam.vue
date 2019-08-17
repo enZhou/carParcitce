@@ -216,7 +216,7 @@ export default {
     flex-wrap: nowrap;
     height: 100%;
     .question-item {
-      min-width: 375px;
+      min-width: 320px;
     }
   }
 }
