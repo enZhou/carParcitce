@@ -59,8 +59,8 @@ export default {
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
-      minMoveX: 40, // 最小滑动距离
       endX: null, //手指停止滑动时X轴坐标
+      minMoveX: 40, // 最小滑动距离
       cout: 0, // 滑动计数器
       moveDir: null, // 滑动方向
       nodeWidth: null, // 滑块宽度

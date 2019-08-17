@@ -2,35 +2,75 @@
 <template>
   <div>
     <!-- tab切换操作 -->
-    <commonPage :active="active" :showType="showType" @changeModal="changeType">
+    <commonPage
+      :active="active"
+      :showType="showType"
+      @changeModal="changeType"
+      @changeInfo="changeInfo"
+    >
       <template slot="content">
-        <div class="question-content">
-          <ul
-            class="question-ul"
-            id="question-ul"
-            @touchstart="boxTouchStart"
-            @touchmove="boxTouchMove"
-            @touchend="boxTouchEnd"
-          >
-            <li class="question-item" v-for="(item,index) in pageDataList" :key="index">
+        <div
+          class="question-content"
+        >
+          <swiper class="question-ul" :options="swiperOption" v-if="showSwpier">
+            <!-- <swiper-slide v-for="(item, index) in pageDataList" :key="index"> -->
+            <swiper-slide class="question-item">
               <question
                 v-if="active === 'answer' && showQuestion"
-                :currentData="item"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex-1]"
                 :info="false"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
               <question
                 v-if="active === 'recite' && showQuestion"
-                :currentData="item"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex-1]"
                 :info="true"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
-            </li>
-          </ul>
+            </swiper-slide>
+            <swiper-slide class="question-item">
+              <question
+                v-if="active === 'answer' && showQuestion"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex]"
+                :info="false"
+                ref="question"
+                @driveimgRead="driveimgRead"
+              ></question>
+              <question
+                v-if="active === 'recite' && showQuestion"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex]"
+                :info="true"
+                ref="question"
+                @driveimgRead="driveimgRead"
+              ></question>
+            </swiper-slide>
+            <swiper-slide class="question-item">
+              <question
+                v-if="active === 'answer' && showQuestion"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex+1]"
+                :info="false"
+                ref="question"
+                @driveimgRead="driveimgRead"
+              ></question>
+              <question
+                v-if="active === 'recite' && showQuestion"
+                data-id="1"
+                :currentData="pageDataList[qusetionIndex+1]"
+                :info="true"
+                ref="question"
+                @driveimgRead="driveimgRead"
+              ></question>
+            </swiper-slide>
+          </swiper>
           <!-- 底部操作等 -->
-          <question-footer :del="true" :uncollected="true"></question-footer>
+          <question-footer ref="questionFooter" :del="true" :uncollected="true"></question-footer>
         </div>
       </template>
     </commonPage>
@@ -40,16 +80,30 @@
 import commonPage from "../../components/commonPage.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
-import api from "../../api/common.js";
+import test from "../../components/test.vue";
+import Swiper from "swiper";
+import api from "../../api/common.js"; // require styles
+import Vue from "vue";
+import "swiper/dist/css/swiper.css";
+
+import { swiper, swiperSlide } from "vue-awesome-swiper";
+
 import { getStore } from "../../common/util.js";
+import { constants } from "crypto";
+
+import $ from "jquery";
 var INDEX = 0;
 var PAGENUM = 100; // 每页条数
 export default {
   components: {
     commonPage,
     questionFooter,
-    Question
+    Question,
+    swiper,
+    swiperSlide,
+    test
   },
+
   data() {
     return {
       active: "answer",
@@ -58,18 +112,35 @@ export default {
       showItem: false,
       dataBase: {}, // 题目
       pageDataList: [], // 分页过后的数据
-      userInfo: null, // 用户信息
-      movebox: null, // 可滑动容器
-      slideItem: null, // 滑动块
-      moveX: null, // 手指滑动的距离
-      minMoveX: 40, // 最小滑动距离
-      endX: null, //手指停止滑动时X轴坐标
-      cout: 0, // 滑动计数器
-      moveDir: null, // 滑动方向
-      nodeWidth: null, // 滑块宽度
-      startX: null, // 触摸的坐标
-      itemLength: 0, // item个数ï
-      setCurrentTimeOut: null
+      showSwpier: false,
+      swiperOption: {
+        // 轮播配置
+        loop: false, // 循环滚动
+        centeredSlides: true,
+        // observer: true, //修改swiper自己或子元素时，自动初始化swiper
+        // observeParents: true, //修改swiper的父元素时，自动初始化swiper
+        on: {
+          slideChange: () => {
+            console.log($(".question-ul"));
+            // PAGENUM++
+            // this.setPageData(PAGENUM,(data)=>{
+            // this.pageDataList = data
+            // });
+            // let Profile = Vue.component({
+            //   template:Question,
+            //   data: () => {
+            //     return {
+            //       item: this.pageDataList[0]
+            //     };
+            //   }
+            // });
+            // new Profile().$mount(".qqqqq");
+          },
+          slideChangeTransitionEnd:function(){
+            console.log(this);
+          }
+        }
+      }
     };
   },
   async created() {
@@ -83,13 +154,14 @@ export default {
             vm.dataBase = res;
             vm.setCurrentData(res.list, res.last_read_id, data => {
               vm.pageDataList = data;
-              vm.showItem = true;
+              vm.showSwpier = true;
               vm.showQuestion = true;
-              vm.initSlide();
+              vm.$refs.questionFooter.getFootData(res);
+              // vm.initSlide();
             });
           });
       } else {
-        vm.initSlide();
+        // vm.initSlide();
       }
     }
   },
@@ -109,96 +181,25 @@ export default {
       total.forEach((element, index) => {
         if (element.id === readId + "") {
           lock = false;
+          vm.dataBase.readIndex = index;
           vm.setPageData(index, data => {
             callback(data);
           });
         }
       });
       if (lock) {
+        vm.dataBase.readIndex = 0;
         vm.setPageData(0, data => {
           callback(data);
         });
       }
     },
+    changeSwiper() {
+      console.log("12312");
+    },
     resetModal() {
       const vm = this;
       vm.$refs.question.resetType();
-    },
-    // 初始化滑动
-    initSlide() {
-      const vm = this;
-      vm.setCurrentTimeOut = setTimeout(() => {
-        clearTimeout(vm.setCurrentTimeOut);
-        console.error("初始化滑动");
-        vm.movebox = document.querySelector(".question-ul"); //滑动对象
-        vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
-        vm.itemLength = PAGENUM;
-        vm.nodeWidth = parseInt(
-          window.getComputedStyle(vm.movebox.parentNode).width
-        ); //滑动对象item的宽度
-        vm.movebox.style.width = vm.nodeWidth * vm.itemLength + "px"; //设置滑动盒子width
-        for (var i = 0; i < vm.itemLength; i++) {
-          vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
-        }
-      }, 30);
-    },
-    // 开始
-    boxTouchStart(e) {
-      const vm = this;
-      var touch = e.touches[0]; //获取触摸对象
-      vm.startX = touch.pageX; //获取触摸坐标
-      vm.moveX = 0;
-      vm.endX = parseInt(vm.cout * -vm.nodeWidth); //获取每次触摸时滑动对象X轴的偏移值
-    },
-    // 移动
-    boxTouchMove(e) {
-      const vm = this;
-      var touch = e.touches[0];
-      vm.moveX = touch.pageX - vm.startX; //手指水平方向移动的距离
-      vm.movebox.style.webkitTransform =
-        "translateX(" + (vm.endX + vm.moveX) + "px)"; //手指滑动时滑动对象随之滑动
-    },
-    // 滑动结束
-    boxTouchEnd(e) {
-      const vm = this;
-      if (Math.abs(vm.moveX) <= 1) {
-        return false;
-      }
-      vm.moveDir = vm.moveX < 0 ? true : false; //滑动方向大于0表示向左滑动，小于0表示向右滑动
-      if (Math.abs(vm.moveX) < vm.minMoveX) {
-        vm.movebox.style.webkitTransform = "translateX(" + vm.endX + "px)"; //手指滑动时滑动对象随之滑动
-        return false;
-      }
-      if (vm.cout == 0 && vm.moveX > 0) {
-        //刚开始第一次向左滑动时
-        vm.movebox.style.webkitTransform = "translateX(" + 0 + "px)"; //手指滑动时滑动对象随之滑动
-        return false;
-      }
-      if (vm.cout == vm.itemLength - 1 && vm.moveX < 0) {
-        //滑动到最后继续向右滑动时
-        vm.movebox.style.webkitTransform = "translateX(" + vm.endX + "px)"; //手指滑动时滑动对象随之滑动
-        return false;
-      }
-      //手指向左滑动
-      if (vm.moveDir) {
-        if (vm.cout < vm.itemLength - 1) {
-          vm.movebox.style.webkitTransform =
-            "translateX(" + (vm.endX - vm.nodeWidth) + "px)";
-          vm.cout++;
-          INDEX++;
-        }
-        //手指向右滑动
-      } else {
-        //滑动到初始状态时返回false
-        if (vm.cout == 0) {
-          return false;
-        } else {
-          vm.movebox.style.webkitTransform =
-            "translateX(" + (vm.endX + vm.nodeWidth) + "px)";
-          vm.cout--;
-          INDEX--;
-        }
-      }
     },
     // 设置分页数据
     setPageData(index, callback) {
@@ -231,6 +232,10 @@ export default {
         .then(res => {
           console.error(res);
         });
+    },
+    // 关闭试题详解
+    changeInfo(val) {
+      console.log(val);
     }
   }
 };
@@ -240,11 +245,11 @@ export default {
   position: absolute;
   width: 100%;
   height: 85%;
-  overflow: hidden;
+  overflow-y: hidden;
   .question-ul {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    // display: flex;
+    // flex-direction: row;
+    // flex-wrap: nowrap;
     height: 100%;
     .question-item {
       min-width: 375px;

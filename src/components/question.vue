@@ -6,15 +6,19 @@
       <span class="_titleType" v-if="!currentData.item3||currentData.item3==''">判断</span>
       <span class="_titleType" v-if="false">多选</span>
       <span>{{currentData.question}}</span>
+      <span>{{currentData.question}}</span>
+      <span>{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
-    
-    <object v-if="currentData.url&&!judgeSwfFiles(currentData.url)" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" :codebase="currentData.url">
-        <param name="SRC" :value="currentData.url">
-        <embed :src="currentData.url" >
-    </object>
 
-  
+    <object
+      v-if="currentData.url&&!judgeSwfFiles(currentData.url)"
+      classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+      :codebase="currentData.url"
+    >
+      <param name="SRC" :value="currentData.url" />
+      <embed :src="currentData.url" />
+    </object>
     <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption(1)">
         <span
@@ -71,7 +75,8 @@
       <div class="info_title">
         <span class="title">试题详解</span>
       </div>
-      <div class="info_content" v-html='currentData.explains'></div>
+      <div class="info_content" v-html="currentData.explains"></div>
+      <div class="info_content" v-html="currentData.explains"></div>
     </div>
   </div>
 </template>
@@ -123,7 +128,7 @@ export default {
       vm.answer = answer;
       vm.isInfo = true;
       vm.showErr = true;
-      vm.$emit('driveimgRead',vm.currentData.id);
+      vm.$emit("driveimgRead", vm.currentData.id);
     },
     getDocement(className) {
       return document.querySelectorAll(`.${className}`);
@@ -135,11 +140,11 @@ export default {
       vm.answerType = false;
       vm.isInfo = false;
     },
-    judgeSwfFiles(file){
-      if(file.indexOf('.swf') == 0){
-        return true
-      }else{
-        return false
+    judgeSwfFiles(file) {
+      if (file.indexOf(".swf") == 0) {
+        return true;
+      } else {
+        return false;
       }
     }
   },
@@ -170,6 +175,9 @@ export default {
 .question_box {
   padding: 0.6rem 0.4rem;
   line-height: 0.5rem;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
   img {
     display: block;
     margin: 0 auto;

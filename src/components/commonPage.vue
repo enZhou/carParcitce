@@ -143,7 +143,8 @@ export default {
     },
     // 设置开关
     check() {
-      console.log(this);
+      const vm = this;
+      vm.$emit('closeInfo',);
     }
   }
 };

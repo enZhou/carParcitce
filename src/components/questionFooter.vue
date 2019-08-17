@@ -31,41 +31,16 @@
           1
         </div>
         <div class="menu" @click="lookMenu">
-          <span class="iconfont ">&#xe685;</span>
-
-          1/22
+          <span class="iconfont">&#xe685;</span>
+          {{(footData.readIndex || 0)+"/"+(footData.total || 0)}}
         </div>
       </div>
     </div>
     <div class="mask" v-if="showOrHideMenu === true" @click="displayMenu"></div>
     <div class="questionlist" v-if="showOrHideMenu === true">
       <ul>
-        <li>
-          <div class="item yes">1</div>
-        </li>
-        <li>
-          <div class="item no">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
-        </li>
-        <li>
-          <div class="item">1</div>
+        <li v-for="(item,index) in footData.list" :key="index+'foot'">
+          <div class="item" :class="item.is_collection===true?'yes':'no'">{{index+1}}</div>
         </li>
       </ul>
     </div>
@@ -75,7 +50,8 @@
 export default {
   data() {
     return {
-      showOrHideMenu: false
+      showOrHideMenu: false,
+      footData:{}
     };
   },
   props: {
@@ -96,16 +72,20 @@ export default {
       default: false
     }
   },
+  mounted() {
+    const vm = this;
+    console.log(vm.footData);
+  },
   methods: {
     // 交卷事件
-    submitClk(){
+    submitClk() {
       let self = this;
-      self.$emit('submitClk');
+      self.$emit("submitClk");
     },
     // 移除事件
-    delClk(){
+    delClk() {
       let self = this;
-      self.$emit('delClk');
+      self.$emit("delClk");
     },
     // 展示题目菜单
     lookMenu() {
@@ -120,6 +100,11 @@ export default {
     displayMenu() {
       let self = this;
       self.showOrHideMenu = false;
+    },
+    getFootData(data){
+      const vm = this;
+      vm.footData =data;
+      console.log(data)
     }
   }
 };
