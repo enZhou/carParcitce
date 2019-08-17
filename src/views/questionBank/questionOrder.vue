@@ -112,6 +112,7 @@ export default {
       showItem: false,
       dataBase: {}, // 题目
       pageDataList: [], // 分页过后的数据
+      qusetionIndex:2,
       showSwpier: false,
       swiperOption: {
         // 轮播配置
@@ -137,7 +138,7 @@ export default {
             // new Profile().$mount(".qqqqq");
           },
           slideChangeTransitionEnd:function(){
-            console.log(this);
+            console.log(this.activeIndex);
           }
         }
       }
