@@ -1,23 +1,21 @@
 <template>
-    <div>
-            {{dataInfo}}
-    </div>
+  <div>{{dataInfo}}</div>
 </template>
 <script>
 export default {
-    data(){
-        return{
-
-        }
-    },
-    props:{
-        dataInfo:{
-            type:Object,
-            default:{}
-        }
-    },
-    mounted(){
-        console.error(this.dataInfo)
-    }
-}
+  data() {
+    return {
+      dataInfo: "12312312"
+    };
+  },
+  // props:{
+  //     dataInfo:{
+  //         type:String,
+  //         default:''
+  //     }
+  // },
+  mounted() {
+    console.error(this.dataInfo);
+  }
+};
 </script>

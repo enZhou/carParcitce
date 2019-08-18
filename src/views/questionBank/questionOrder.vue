@@ -9,16 +9,13 @@
       @changeInfo="changeInfo"
     >
       <template slot="content">
-        <div
-          class="question-content"
-        >
+        <div class="question-content">
           <swiper class="question-ul" :options="swiperOption" v-if="showSwpier">
-            <!-- <swiper-slide v-for="(item, index) in pageDataList" :key="index"> -->
-            <swiper-slide class="question-item">
+            <!-- <swiper-slide  class="question-item" v-for="(item, index) in pageDataList" :key="index">
               <question
                 v-if="active === 'answer' && showQuestion"
                 data-id="1"
-                :currentData="pageDataList[qusetionIndex-1]"
+                :currentData="item"
                 :info="false"
                 ref="question"
                 @driveimgRead="driveimgRead"
@@ -26,12 +23,12 @@
               <question
                 v-if="active === 'recite' && showQuestion"
                 data-id="1"
-                :currentData="pageDataList[qusetionIndex-1]"
+                :currentData="item"
                 :info="true"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
-            </swiper-slide>
+            </swiper-slide> -->
             <swiper-slide class="question-item">
               <question
                 v-if="active === 'answer' && showQuestion"
@@ -50,7 +47,7 @@
                 @driveimgRead="driveimgRead"
               ></question>
             </swiper-slide>
-            <swiper-slide class="question-item">
+            <!-- <swiper-slide class="question-item" id="question-item3">
               <question
                 v-if="active === 'answer' && showQuestion"
                 data-id="1"
@@ -67,11 +64,13 @@
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
-            </swiper-slide>
+            </swiper-slide> -->
           </swiper>
           <!-- 底部操作等 -->
+          <div ref="testBox" id="testBox"></div>
           <question-footer ref="questionFooter" :del="true" :uncollected="true"></question-footer>
         </div>
+        <!-- <test id='Test' :dataInfo='"1231"'></test> -->
       </template>
     </commonPage>
   </div>
@@ -93,7 +92,7 @@ import { constants } from "crypto";
 
 import $ from "jquery";
 var INDEX = 0;
-var PAGENUM = 100; // 每页条数
+var PAGENUM = 3; // 每页条数
 export default {
   components: {
     commonPage,
@@ -112,7 +111,7 @@ export default {
       showItem: false,
       dataBase: {}, // 题目
       pageDataList: [], // 分页过后的数据
-      qusetionIndex:2,
+      qusetionIndex: 1,
       showSwpier: false,
       swiperOption: {
         // 轮播配置
@@ -120,24 +119,16 @@ export default {
         centeredSlides: true,
         on: {
           slideChange: () => {
-            console.log($(".question-ul"));
             // PAGENUM++
             // this.setPageData(PAGENUM,(data)=>{
             // this.pageDataList = data
             // });
-            // let Profile = Vue.component({
-            //   template:Question,
-            //   data: () => {
-            //     return {
-            //       item: this.pageDataList[0]
-            //     };
-            //   }
-            // });
+            let Profile = Vue.extend(test);
+            console.log(Profile);
+            new Profile().$mount(`#testBox`);
+            // this.$refs.testBox.appendChild(Profile.$el);
             // new Profile().$mount(".qqqqq");
           },
-          slideChangeTransitionEnd:function(){
-            console.log(this.activeIndex);
-          }
         }
       }
     };
@@ -146,22 +137,18 @@ export default {
     const vm = this;
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (Object.keys(vm.$route.query).length > 0) {
-      if (Object.keys(vm.dataBase).length <= 0) {
-        api
-          .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
-          .then(res => {
-            vm.dataBase = res;
-            vm.setCurrentData(res.list, res.last_read_id, data => {
-              vm.pageDataList = data;
-              vm.showSwpier = true;
-              vm.showQuestion = true;
-              vm.$refs.questionFooter.getFootData(res);
-              // vm.initSlide();
-            });
+      api
+        .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
+        .then(res => {
+          vm.dataBase = res;
+          vm.setCurrentData(res.list, res.last_read_id, data => {
+            vm.pageDataList = data;
+            vm.showSwpier = true;
+            vm.showQuestion = true;
+            vm.$refs.questionFooter.getFootData(res);
+            // vm.initSlide();
           });
-      } else {
-        // vm.initSlide();
-      }
+        });
     }
   },
   mounted() {
