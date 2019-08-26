@@ -6,12 +6,10 @@ import i18n from './locale'
 import filters from './filters'
 
 import VueAwesomeSwiper from 'vue-awesome-swiper'
-// import $ from 'jquery'
 import 'swiper/dist/css/swiper.css'
 import Toast from './components/toast/index'
 Vue.use(VueAwesomeSwiper, /* { default global options } */)
 Vue.use(Toast);
-// Vue.use($);
 
 Vue.config.productionTip = false
 

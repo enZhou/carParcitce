@@ -140,5 +140,25 @@ export default {
     getDrivingTest(id,type) {
         return axiosGet(`driving/test?user_id=${id}&type=${type}`);
     },
+    // 收藏/取消收藏
+    setCollection(id,type,question_id,collection_type) {
+        return axiosGet(`driving/collection?user_id=${id}&type=${type}&question_id=${question_id}&collection_type=${collection_type}`);
+    },
+    // 提交测评
+    setSubmitTest(id,type,time,score,content) {
+        return axiosGet(`driving/submitTest?user_id=${id}&type=${type}&time=${time}&score=${score}&content=${content}`);
+    },
+    // 提交错题
+    setDrivingWrong(id,type,question_id) {
+        return axiosGet(`driving/wrong?user_id=${id}&type=${type}&question_id=${question_id}`);
+    },    
+    // 获取错题列表
+    getDrivingWrongList(id,type) {
+        return axiosGet(`driving/wrongList?user_id=${id}&type=${type}`);
+    },
+    // 获取错题列表
+    setDrivingClearWrong(id,wang_id) {
+        return axiosGet(`driving/clearWrong?user_id=${id}&wang_id=${wang_id}`);
+    }
 
 }

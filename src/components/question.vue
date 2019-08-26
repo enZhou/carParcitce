@@ -5,12 +5,9 @@
       <span class="_titleType" v-if="currentData.item3!=''">单选</span>
       <span class="_titleType" v-if="!currentData.item3||currentData.item3==''">判断</span>
       <span class="_titleType" v-if="false">多选</span>
-      <span>{{currentData.question}}</span>
-      <span>{{currentData.question}}</span>
-      <span>{{currentData.question}}</span>
+      <span :class="isMotifType=='night'?'night':''">{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
-
     <object
       v-if="currentData.url&&!judgeSwfFiles(currentData.url)"
       classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
@@ -30,9 +27,9 @@
           v-else-if="currentData.answer !== 1 && answer ==1 && showErr"
         ></span>
         <div class="option" v-else>
-          <span>A</span>
+          <span :class="isMotifType=='night'?'night':''">A</span>
         </div>
-        <span>{{currentData.item1}}</span>
+        <span :class="isMotifType=='night'?'night':''">{{currentData.item1}}</span>
       </li>
       <li v-if="currentData.item2" @click="chooseOption(2)">
         <span
@@ -43,8 +40,8 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 2 && answer ==2 && showErr"
         ></span>
-        <div class="option" v-else>B</div>
-        <span>{{currentData.item2}}</span>
+        <div class="option" v-else :class="isMotifType=='night'?'night':''">B</div>
+        <span :class="isMotifType=='night'?'night':''">{{currentData.item2}}</span>
       </li>
       <li v-if="currentData.item3" @click="chooseOption(3)">
         <span
@@ -55,8 +52,8 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 3 && answer ==3 && showErr"
         ></span>
-        <div class="option" v-else>C</div>
-        <span>{{currentData.item3}}</span>
+        <div class="option" :class="isMotifType=='night'?'night':''" v-else>C</div>
+        <span :class="isMotifType=='night'?'night':''">{{currentData.item3}}</span>
       </li>
       <li v-if="currentData.item4" @click="chooseOption(4)">
         <span
@@ -67,16 +64,18 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 4 && answer ==4 && showErr"
         ></span>
-        <div class="option" v-else>D</div>
-        <span>{{currentData.item4}}</span>
+        <div class="option" :class="isMotifType=='night'?'night':''" v-else>D</div>
+        <span :class="isMotifType=='night'?'night':''">{{currentData.item4}}</span>
       </li>
     </ul>
-    <div class="questionInfo" v-if="isInfo">
-      <div class="info_title">
-        <span class="title">试题详解</span>
+    <div v-if="showErrExplain">
+      <div class="questionInfo" v-if="isInfo">
+        <div class="info_title">
+          <span :class="isMotifType=='night'?'night':''" class="title">试题详解</span>
+        </div>
+        <div class="info_content" :class="isMotifType=='night'?'night':''" v-html="currentData.explains"></div>
+        <div class="info_content" :class="isMotifType=='night'?'night':''" v-html="currentData.explains"></div>
       </div>
-      <div class="info_content" v-html="currentData.explains"></div>
-      <div class="info_content" v-html="currentData.explains"></div>
     </div>
   </div>
 </template>
@@ -90,7 +89,10 @@ export default {
       answerType: false,
       isInfo: false,
       showErr: false, // 是否显示错误答案
-      userInfo: null
+      userInfo: null,
+      showErrExplain: this.isShowErrExplain,
+      currentData: Object.assign({}, this.topicInfo), // 题目信息
+      isMotifType: this.motifType
     };
   },
   props: {
@@ -99,7 +101,15 @@ export default {
       type: Boolean,
       default: false
     },
-    currentData: {
+    isShowErrExplain: {
+      type: Boolean,
+      default: false
+    },
+    motifType: {
+      type: String,
+      default: "criteria"
+    },
+    topicInfo: {
       type: Object,
       default: {
         id: null,
@@ -128,7 +138,9 @@ export default {
       vm.answer = answer;
       vm.isInfo = true;
       vm.showErr = true;
-      vm.$emit("driveimgRead", vm.currentData.id);
+      vm.$emit("driveimgRead", vm.currentData.id,answer);
+      vm.$emit("yetTipicList", vm.currentData.id,vm.currentData.answer,answer);
+      vm.currentData.currentType = true;
     },
     getDocement(className) {
       return document.querySelectorAll(`.${className}`);
@@ -137,8 +149,9 @@ export default {
     resetType() {
       const vm = this;
       vm.answer = null;
-      vm.answerType = false;
       vm.isInfo = false;
+      vm.showErr = false;
+      vm.answerType = false;
     },
     judgeSwfFiles(file) {
       if (file.indexOf(".swf") == 0) {
@@ -149,6 +162,21 @@ export default {
     }
   },
   watch: {
+    topicInfo(val, oldval) {
+      let vm = this;
+      vm.currentData = Object.assign({}, val);
+      if (!vm.info) {
+        vm.resetType();
+      }
+    },
+    isShowErrExplain(val, old) {
+      let vm = this;
+      vm.showErrExplain = val;
+    },
+    motifType(val, old) {
+      let vm = this;
+      vm.isMotifType = val;
+    },
     info(val, oldVal) {
       const vm = this;
       vm.isInfo = val;
@@ -247,5 +275,9 @@ export default {
       margin: 0 auto;
     }
   }
+}
+
+.night {
+  color: #fff !important;
 }
 </style>

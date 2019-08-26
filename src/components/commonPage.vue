@@ -1,9 +1,9 @@
 <!-- 公共头部 -->
 <template>
-  <div class="content">
+  <div class="content" v-if="showContent">
     <!-- tab -->
     <div class="tab-header">
-      <span class="iconfont return" @click="$router.back(-1)">&#xe62a;</span>
+      <span class="iconfont return" @click="goBack">&#xe62a;</span>
       <div class="tabs" v-if="showType === 'tab'">
         <div
           class="tab"
@@ -11,9 +11,7 @@
           v-for="(item, index) in navList"
           :key="index"
           @click="changemodal(item.type)"
-        >
-          {{ item.name }}
-        </div>
+        >{{ item.name }}</div>
       </div>
       <!-- 倒计时 -->
       <div class="time" v-if="showType === 'time'">
@@ -34,45 +32,49 @@
     <div class="tab-body" v-if="showType === 'tab'">
       <slot name="content"></slot>
     </div>
-    <div
-      class="mask"
-      v-if="showSetMenu == true"
-      @click="showSetMenu = !showSetMenu"
-    ></div>
-    <div class="setContent" v-if="showSetMenu == true">
+    <div class="mask" v-if="showSetMenu == true" @click="showSetMenu = !showSetMenu"></div>
+    <div class="setContent" v-show="showSetMenu == true">
       <ul>
         <li>
           <span class="title">答对跳转下一题</span>
-          <input class="switch switch-anim" @change="check()" type="checkbox" />
+          <input class="switch switch-anim" @change="autoSkip($event)" type="checkbox" />
         </li>
         <li>
           <span class="title">答错展示试题详解</span>
-          <input class="switch switch-anim" @change="check()" type="checkbox" />
+          <input class="switch switch-anim" @change="showErrExplain($event)" type="checkbox" />
         </li>
-        <li>
+        <!-- <li>
           <span class="title">提示声音</span>
-          <input class="switch switch-anim" @change="check()" type="checkbox" />
-        </li>
+          <input class="switch switch-anim" @change="openVoice($event)" type="checkbox" />
+        </li>-->
         <li>
           <span class="title">主题切换</span>
-          <div>
-            <div>标准</div>
-            <div>夜间</div>
+          <div class="setting-motif">
+            <div class="criteria" @click="changeMotif('criteria')">
+              <span class="iconfont motif-box" :class="motif == 'criteria'?'active':''">&#xe64c;</span>
+              <span>标准</span>
+            </div>
+            <div @click="changeMotif('night')">
+              <span class="iconfont motif-box" :class="motif == 'night'?'active':''">&#xe74d;</span>
+              <span>夜间</span>
+            </div>
           </div>
         </li>
-        <li>
+        <!-- <li>
           <span class="title">字体大小</span>
           <div class="fontList">
             <span class="font small">A标准</span>
             <span class="font middle">A大号</span>
             <span class="font big">A超大号</span>
           </div>
-        </li>
+        </li>-->
       </ul>
     </div>
   </div>
 </template>
 <script>
+import $ from "jquery";
+const timeOutVal = 60; // 考试时间 分
 export default {
   data() {
     return {
@@ -88,7 +90,10 @@ export default {
         }
       ],
       times: "",
-      showSetMenu: false
+      showSetMenu: false,
+      showContent: true,
+      sumTimeOut: 0, // 倒计时
+      motif: "criteria" //主题
     };
   },
   props: {
@@ -109,42 +114,64 @@ export default {
     }
   },
   mounted() {
-    this.Countdown();
+    let vm = this;
+    if (vm.showType === "time") {
+      this.Countdown();
+    }
   },
   destroyed() {
     this.Countdown();
   },
   methods: {
+    goBack() {
+      let vm = this;
+      window.history.go(-1);
+      vm.showSetMenu = false;
+    },
     changemodal(type) {
       let self = this;
       self.$emit("changeModal", type);
     },
     Countdown() {
+      let vm = this;
       const startTime = Date.parse(new Date());
-      // 初始化倒计时
-      this.init = function() {
-        var endTime = startTime + 24 * 60 * 60 * 1000; // 结束时间
-        var timeLeft = endTime - new Date().getTime(); // 剩余时间
-
-        // 格式化时间
-        var minutes = parseInt((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = parseInt((timeLeft % (1000 * 60)) / 1000);
-        this.times =
-          (minutes < 10 ? "0" + minutes : minutes) +
-          ":" +
-          (seconds < 10 ? "0" + seconds : seconds);
-        // 轮询计算时间
-        var that = this;
-        setInterval(function() {
-          that.init();
-        }, 1000);
-      };
-      this.init();
+      vm.sumTimeOut = timeOutVal * 60;
+      if (vm.sumTimeOut <= 0) {
+        clearInterval(interval);
+      }
+      let interval = setInterval(() => {
+        vm.sumTimeOut--;
+        let min = parseInt(vm.sumTimeOut / 60);
+        let sec = parseInt(vm.sumTimeOut - min * 60);
+        vm.times =
+          (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
+      }, 999);
     },
-    // 设置开关
-    check() {
+    // 考试时间
+    getTime() {
+      let vm = this;
+      return timeOutVal * 60 - vm.sumTimeOut;
+    },
+    // 自动跳转下一题
+    autoSkip(e) {
+      let vm = this;
+      vm.$emit("autoSkip", $(e.target).is(":checked"));
+    },
+    // 显示试题详解
+    showErrExplain(e) {
       const vm = this;
-      vm.$emit('closeInfo',);
+      vm.$emit("showErrExplain", $(e.target).is(":checked"));
+    },
+    // 声音
+    openVoice(e) {
+      let vm = this;
+      vm.$emit("openVoice", $(e.target).is(":checked"));
+    },
+    // 切换主题
+    changeMotif(type) {
+      let vm = this;
+      vm.motif = type;
+      vm.$emit("setMotif", type);
     }
   }
 };
@@ -289,5 +316,32 @@ export default {
 }
 .switch.switch-anim:checked:before {
   transition: left 0.3s;
+}
+.setting-motif {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .motif-box {
+      display: block;
+      width: 0.7rem;
+      height: 0.7rem;
+      padding: 0.1rem;
+      font-size: 0.5rem;
+      border-radius: 0.4rem;
+      background-color: #b1b7be;
+      color: #e5e5e5;
+    }
+  }
+  .criteria {
+    margin-right: 0.7rem;
+  }
+  .active {
+    background-color: #00c356 !important;
+  }
 }
 </style>

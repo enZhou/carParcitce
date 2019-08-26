@@ -6,73 +6,52 @@
       :active="active"
       :showType="showType"
       @changeModal="changeType"
-      @changeInfo="changeInfo"
+      @autoSkip="autoSkip"
+      @showErrExplain="showErrExplain"
+      @openVoice="openVoice"
+      @setMotif="setMotif"
     >
       <template slot="content">
-        <div class="question-content">
-          <swiper class="question-ul" :options="swiperOption" v-if="showSwpier">
-            <!-- <swiper-slide  class="question-item" v-for="(item, index) in pageDataList" :key="index">
+        <div class="question-content" :class="motifType=='night'?'night':''">
+          <ul
+            class="question-ul"
+            id="question-ul"
+            @touchstart="boxTouchStart"
+            @touchmove="boxTouchMove"
+            @touchend="boxTouchEnd"
+          >
+            <li class="question-item" v-for="(item,index) in pageDataList" :key="index">
               <question
-                v-if="active === 'answer' && showQuestion"
-                data-id="1"
-                :currentData="item"
+                v-if="active === 'answer'"
+                :topicInfo="item"
                 :info="false"
+                :isShowErrExplain="isShowErrExplain"
+                :motifType="motifType"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
               <question
-                v-if="active === 'recite' && showQuestion"
-                data-id="1"
-                :currentData="item"
+                v-if="active === 'recite'"
+                :topicInfo="item"
+                :isShowErrExplain="isShowErrExplain"
+                :motifType="motifType"
                 :info="true"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
-            </swiper-slide> -->
-            <swiper-slide class="question-item">
-              <question
-                v-if="active === 'answer' && showQuestion"
-                data-id="1"
-                :currentData="pageDataList[qusetionIndex]"
-                :info="false"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-              <question
-                v-if="active === 'recite' && showQuestion"
-                data-id="1"
-                :currentData="pageDataList[qusetionIndex]"
-                :info="true"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-            </swiper-slide>
-            <!-- <swiper-slide class="question-item" id="question-item3">
-              <question
-                v-if="active === 'answer' && showQuestion"
-                data-id="1"
-                :currentData="pageDataList[qusetionIndex+1]"
-                :info="false"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-              <question
-                v-if="active === 'recite' && showQuestion"
-                data-id="1"
-                :currentData="pageDataList[qusetionIndex+1]"
-                :info="true"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-            </swiper-slide> -->
-          </swiper>
-          <!-- 底部操作等 -->
-          <div ref="testBox" id="testBox"></div>
-          <question-footer ref="questionFooter" :del="true" :uncollected="true"></question-footer>
+            </li>
+          </ul>
         </div>
-        <!-- <test id='Test' :dataInfo='"1231"'></test> -->
       </template>
     </commonPage>
+    <!-- 底部操作 -->
+    <question-footer
+      ref="questionFooter"
+      :submit="false"
+      :uncollected="true"
+      @gotoIndex="gotoIndex"
+      @httpCollection="httpCollection"
+    ></question-footer>
   </div>
 </template>
 <script>
@@ -80,26 +59,16 @@ import commonPage from "../../components/commonPage.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
 import test from "../../components/test.vue";
-import Swiper from "swiper";
 import api from "../../api/common.js"; // require styles
-import Vue from "vue";
-import "swiper/dist/css/swiper.css";
-
-import { swiper, swiperSlide } from "vue-awesome-swiper";
-
-import { getStore } from "../../common/util.js";
-import { constants } from "crypto";
-
+import { setStore, getStore, removeStore } from "../../common/util.js";
 import $ from "jquery";
 var INDEX = 0;
-var PAGENUM = 3; // 每页条数
+var PAGENUM = 20; // 每页条数
 export default {
   components: {
     commonPage,
     questionFooter,
     Question,
-    swiper,
-    swiperSlide,
     test
   },
 
@@ -107,81 +76,224 @@ export default {
     return {
       active: "answer",
       showType: "tab",
-      showQuestion: false,
-      showItem: false,
-      dataBase: {}, // 题目
+
+      movebox: null, // 可滑动容器
+      slideItem: null, // 滑动块
+      moveX: null, // 手指滑动的距离
+      endX: null, //手指停止滑动时X轴坐标
+      minMoveX: 40, // 最小滑动距离
+      cout: 0, // 滑动计数器
+      moveDir: null, // 滑动方向
+      nodeWidth: null, // 滑块宽度
+      startX: null, // 触摸的坐标
+      motifType: null, // 主题
+      isShowErrExplain: false, // 错误详解
+      isAutoSkip: false, // 自动跳转下一题
       pageDataList: [], // 分页过后的数据
-      qusetionIndex: 1,
-      showSwpier: false,
-      swiperOption: {
-        // 轮播配置
-        loop: false, // 循环滚动
-        centeredSlides: true,
-        on: {
-          slideChange: () => {
-            // PAGENUM++
-            // this.setPageData(PAGENUM,(data)=>{
-            // this.pageDataList = data
-            // });
-            let Profile = Vue.extend(test);
-            console.log(Profile);
-            new Profile().$mount(`#testBox`);
-            // this.$refs.testBox.appendChild(Profile.$el);
-            // new Profile().$mount(".qqqqq");
-          },
-        }
+      topicCacheData: [], // 缓存数据
+      userTopicInfo: {
+        last_read_id: null, // 历史阅读位置题目id
+        total: null, // 题目总数
+        readIndex: null, // 当前阅读位置
+        collection: null // 是否收藏
       }
     };
   },
   async created() {
     const vm = this;
-    vm.userInfo = JSON.parse(getStore("loginInfo"));
-    if (Object.keys(vm.$route.query).length > 0) {
-      api
-        .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
-        .then(res => {
-          vm.dataBase = res;
-          vm.setCurrentData(res.list, res.last_read_id, data => {
-            vm.pageDataList = data;
-            vm.showSwpier = true;
-            vm.showQuestion = true;
-            vm.$refs.questionFooter.getFootData(res);
-            // vm.initSlide();
-          });
-        });
-    }
+    vm.initPage(true);
   },
   mounted() {
     const vm = this;
   },
   methods: {
+    initPage(type) {
+      let vm = this;
+      vm.userInfo = JSON.parse(getStore("loginInfo"));
+      vm.topicCacheData = JSON.parse(
+        getStore(`vehicleList${vm.$route.query.type}`)
+      );
+      if (type) {
+        if (Object.keys(vm.$route.query).length > 0) {
+          api
+            .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
+            .then(res => {
+              if (!vm.topicCacheData || vm.topicCacheData.length <= 0) {
+                vm.topicCacheData = res.list;
+                setStore(`vehicleList${vm.$route.query.type}`, res.list);
+              }
+              vm.userTopicInfo = {
+                last_read_id: res.last_read_id,
+                total: res.total
+              };
+              vm.setCurrentData(
+                vm.topicCacheData,
+                vm.userTopicInfo.last_read_id,
+                data => {
+                  vm.pageDataList = data;
+                  vm.$nextTick(() => {
+                    vm.initSlide();
+                  });
+                }
+              );
+              vm.$refs.questionFooter.setFootData(
+                vm.userTopicInfo.total,
+                vm.topicCacheData,
+                vm.userTopicInfo.readIndex
+              );
+              vm.setCollection();
+            });
+        }
+      } else {
+        vm.setCurrentData(
+          vm.topicCacheData,
+          vm.userTopicInfo.last_read_id,
+          data => {
+            vm.pageDataList = data;
+          }
+        );
+      }
+    },
+    // 初始化滑动
+    initSlide() {
+      const vm = this;
+      vm.movebox = document.querySelector(".question-ul"); //滑动对象
+      vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
+      vm.itemLength = PAGENUM;
+      vm.nodeWidth = parseInt(
+        window.getComputedStyle(vm.movebox.parentNode).width
+      ); //滑动对象item的宽度
+      vm.movebox.style.width = vm.nodeWidth * vm.itemLength + "px"; //设置滑动盒子width
+
+      for (var i = 0; i < vm.itemLength; i++) {
+        vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
+      }
+    },
+    // 开始
+    boxTouchStart(e) {
+      const vm = this;
+      var touch = e.touches[0]; //获取触摸对象
+      vm.startX = touch.pageX; //获取触摸坐标
+      vm.moveX = 0;
+      vm.endX = parseInt(vm.cout * -vm.nodeWidth); //获取每次触摸时滑动对象X轴的偏移值
+    },
+    // 移动
+    boxTouchMove(e) {
+      const vm = this;
+      var touch = e.touches[0];
+      vm.moveX = touch.pageX - vm.startX; //手指水平方向移动的距离
+      vm.movebox.style.webkitTransform =
+        "translateX(" + (vm.endX + vm.moveX) + "px)"; //手指滑动时滑动对象随之滑动
+    },
+    // 滑动结束
+    boxTouchEnd(e, type) {
+      const vm = this;
+      if (vm.isAutoSkip && type === true) {
+        vm.moveX = -10;
+      } else {
+        if (Math.abs(vm.moveX) <= 1) {
+          return false;
+        }
+        if (Math.abs(vm.moveX) < vm.minMoveX) {
+          vm.movebox.style.webkitTransform = "translateX(" + vm.endX + "px)"; //手指滑动时滑动对象随之滑动
+          return false;
+        }
+      }
+      vm.moveDir = vm.moveX < 0 ? true : false; //滑动方向大于0表示向左滑动，小于0表示向右滑动
+      if (vm.cout == 0 && vm.moveX > 0) {
+        console.log("继续向左");
+        if (INDEX <= 0) {
+          vm.cout = 0;
+        } else {
+          if (INDEX - PAGENUM <= 0) {
+            INDEX = 0;
+            vm.cout = 0;
+          } else {
+            INDEX -= PAGENUM;
+            vm.cout = PAGENUM - 1;
+          }
+        }
+        this.setPageData(INDEX, data => {
+          this.pageDataList = data;
+        });
+        //刚开始第一次向左滑动时
+        vm.movebox.style.webkitTransform =
+          "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
+        return false;
+      }
+      if (vm.cout == vm.itemLength - 1 && vm.moveX < 0) {
+        if (INDEX <= vm.topicCacheData.length - PAGENUM) {
+          INDEX += PAGENUM;
+        } else {
+          INDEX = vm.topicCacheData.length - PAGENUM;
+        }
+        this.setPageData(INDEX, data => {
+          this.pageDataList = data;
+        });
+        vm.cout = 0;
+        console.log("继续向you");
+        //滑动到最后继续向右滑动时
+        vm.movebox.style.webkitTransform =
+          "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
+        return false;
+      }
+      //手指向左滑动
+      if (vm.moveDir) {
+        console.log("下一条");
+        if (vm.cout < vm.itemLength - 1) {
+          vm.movebox.style.webkitTransform =
+            "translateX(" + (vm.endX - vm.nodeWidth) + "px)";
+          vm.cout++;
+          INDEX++;
+        }
+        //手指向右滑动
+      } else {
+        console.log("上一条");
+        if (INDEX <= 0) {
+          INDEX = 0;
+          vm.cout = 0;
+        }
+        if (vm.cout == 0) {
+          vm.movebox.style.webkitTransform = "translateX(0px)";
+          return false;
+        } else {
+          vm.movebox.style.webkitTransform =
+            "translateX(" + (vm.endX + vm.nodeWidth) + "px)";
+          vm.cout--;
+          INDEX--;
+        }
+      }
+      vm.setCollection();
+    },
+
     //选择模式
     changeType(val) {
       let self = this;
       self.active = val;
+      if (self.active === "recite") {
+        self.showErrExplain(true);
+      }
     },
     // 处理数据
-    setCurrentData(total, readId, callback) {
+    setCurrentData(list, readId, callback) {
       const vm = this;
       let lock = true;
-      total.forEach((element, index) => {
+      list.forEach((element, index) => {
         if (element.id === readId + "") {
           lock = false;
-          vm.dataBase.readIndex = index;
+          vm.userTopicInfo.readIndex = index;
+          INDEX = index;
           vm.setPageData(index, data => {
             callback(data);
           });
         }
       });
       if (lock) {
-        vm.dataBase.readIndex = 0;
+        vm.userTopicInfo.readIndex = 0;
         vm.setPageData(0, data => {
           callback(data);
         });
       }
-    },
-    changeSwiper() {
-      console.log("12312");
     },
     resetModal() {
       const vm = this;
@@ -190,24 +302,43 @@ export default {
     // 设置分页数据
     setPageData(index, callback) {
       const vm = this;
-      INDEX = index;
+      let _index = index;
       let pagingArr = new Array();
+      let forIndex = null;
       for (let i = 0; i < PAGENUM; i++) {
-        INDEX++;
-        pagingArr.push(vm.dataBase.list[INDEX]);
+        pagingArr.push(vm.topicCacheData[_index]);
+        _index++;
       }
       callback(pagingArr);
     },
     // 保存阅读位置
-    driveimgRead(questionId) {
+    driveimgRead(questionId, answer) {
       const vm = this;
-      console.log(vm.$route.query);
       let params = {
         user_id: vm.userInfo.user_id,
         type: vm.$route.query.type,
         question_id: questionId,
         read_count: parseFloat(vm.$route.query.readCount)
       };
+      let isAnswer = false;
+      vm.topicCacheData.forEach((element, index) => {
+        if (element.id === questionId + "") {
+          vm.userTopicInfo.readIndex = index;
+          vm.userTopicInfo.is_collection = element.is_collection;
+          element.isRead = true;
+          if (element.answer === answer + "") {
+            isAnswer = true;
+          }else{
+            vm.setDrivingWrong(questionId);
+          }
+        }
+      });
+      removeStore(`vehicleList${vm.$route.query.type}`);
+      setStore(`vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      if (vm.isAutoSkip && isAnswer) {
+        vm.boxTouchEnd(false, true);
+      }
+      // vm.initPage(false);
       api
         .getDrivingRead(
           vm.userInfo.user_id,
@@ -216,12 +347,88 @@ export default {
           parseFloat(vm.$route.query.readCount) + vm.cout + 1
         )
         .then(res => {
-          console.error(res);
+          vm.$refs.questionFooter.setFootData(
+            vm.userTopicInfo.total,
+            vm.topicCacheData,
+            vm.userTopicInfo.readIndex
+          );
         });
     },
+    // 跳转到某个题
+    gotoIndex(index) {
+      let vm = this;
+      vm.setCurrentData(vm.topicCacheData, index, data => {
+        vm.pageDataList = data;
+      });
+      vm.setCollection();
+    },
+    // 设置是否已收藏
+    setCollection() {
+      let vm = this;
+      vm.$refs.questionFooter.getCollection(
+        vm.topicCacheData[INDEX].is_collection,
+        vm.topicCacheData[INDEX].id
+      );
+    },
+    // 修改收藏状态
+    httpCollection(type) {
+      let vm = this;
+      let isCollection = type === 0 ? false : true;
+      let questionId = vm.topicCacheData[INDEX].id;
+      vm.topicCacheData.forEach((element, index) => {
+        if (element.id === questionId + "") {
+          element.is_collection = isCollection;
+        }
+      });
+      removeStore(`vehicleList${vm.$route.query.type}`);
+      setStore(`vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      api
+        .setCollection(
+          vm.userInfo.user_id,
+          vm.$route.query.type,
+          questionId,
+          type
+        )
+        .then(res => {
+          vm.setCollection();
+        });
+    },
+    // 自动跳转下一题
+    autoSkip(type) {
+      let vm = this;
+      if (this.active === "recite") {
+        vm.isAutoSkip = true;
+      } else {
+        vm.isAutoSkip = type;
+      }
+    },
     // 关闭试题详解
-    changeInfo(val) {
+    showErrExplain(val) {
+      let vm = this;
+      vm.isShowErrExplain = val;
       console.log(val);
+    },
+    // 开启声音
+    openVoice(val) {
+      console.log(val);
+    },
+    // 设置主题
+    setMotif(type) {
+      let vm = this;
+      vm.motifType = type;
+    },
+    //提交错题
+    setDrivingWrong(questionId) {
+      let vm = this;
+      api
+        .setDrivingWrong(
+          vm.userInfo.user_id,
+          vm.$route.query.type,
+          questionId
+        )
+        .then(res => {
+          
+        });
     }
   }
 };
@@ -231,9 +438,20 @@ export default {
   position: absolute;
   width: 100%;
   height: 85%;
-  overflow-y: hidden;
+  overflow: hidden;
+
   .question-ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     height: 100%;
+    .question-item {
+      width: 100%;
+      min-width: 320px;
+    }
   }
+}
+.night {
+  background-color: #333;
 }
 </style>

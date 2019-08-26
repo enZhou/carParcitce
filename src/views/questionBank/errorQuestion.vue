@@ -1,123 +1,206 @@
-<!-- 我的错题 -->
+<!-- 模拟考试 -->
 <template>
   <div>
-    <!-- tab切换操作 -->
-    <commonPage :active="active" :showType="showType" @changeModal="changeType">
-      <template slot="content">
-        <div class="question-content">
-          <ul
-            class="question-ul"
-            id="question-ul"
-            @touchstart="boxTouchStart"
-            @touchmove="boxTouchMove"
-            @touchend="boxTouchEnd"
-          >
-            <li class="question-item" v-for="(item,index) in pageDataList" :key="index">
-              <question
-                v-if="active === 'answer' && showQuestion"
-                :currentData="item"
-                :info="false"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-              <question
-                v-if="active === 'recite' && showQuestion"
-                :currentData="item"
-                :info="true"
-                ref="question"
-                @driveimgRead="driveimgRead"
-              ></question>
-            </li>
-          </ul>
-          <!-- 底部操作等 -->
-          <question-footer :del="true" :uncollected="true"></question-footer>
-        </div>
-      </template>
-    </commonPage>
+    <commonPage
+      ref="commonPage"
+      :active="active"
+      :showType="showType"
+      @changeModal="changeType"
+      @autoSkip="autoSkip"
+      @showErrExplain="showErrExplain"
+      @openVoice="openVoice"
+      @setMotif="setMotif"
+    ></commonPage>
+    <div class="question-content" :class="motifType=='night'?'night':''">
+      <ul
+        class="question-ul"
+        @touchstart="boxTouchStart"
+        @touchmove="boxTouchMove"
+        @touchend="boxTouchEnd"
+      >
+        <li class="question-item" v-for="(item,index) in topicArr" :key="index">
+          <!-- <question
+            :topicInfo="item"
+            :info="true"
+            :isShowErrExplain="isShowErrExplain"
+            :motifType="motifType"
+            ref="question"
+            @yetTipicList="yetTipicList"
+          ></question>-->
+          <question
+            v-if="active === 'answer'"
+            :topicInfo="item"
+            :info="false"
+            :isShowErrExplain="isShowErrExplain"
+            :motifType="motifType"
+            ref="question"
+          ></question>
+          <question
+            v-if="active === 'recite'"
+            :topicInfo="item"
+            :isShowErrExplain="isShowErrExplain"
+            :motifType="motifType"
+            :info="true"
+            ref="question"
+          ></question>
+        </li>
+      </ul>
+    </div>
+    <!-- 底部操作 -->
+    <question-footer
+      ref="questionFooter"
+      :submit="false"
+      :uncollected="true"
+      :del="true"
+      @gotoIndex="gotoIndex"
+      @httpCollection="httpCollection"
+      @delClk="delClk"
+    ></question-footer>
   </div>
 </template>
 <script>
 import commonPage from "../../components/commonPage.vue";
-import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
+import questionFooter from "../../components/questionFooter.vue";
+import questionDialog from "../../components/questionDialog.vue";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
 var INDEX = 0;
-var PAGENUM = 10; // 每页条数
+var PAGENUM = 0; // 每页条数
+var SCORE = 0; // 分数
 export default {
   components: {
     commonPage,
+    Question,
     questionFooter,
-    Question
+    questionDialog
   },
   data() {
     return {
       active: "answer",
       showType: "tab",
-      showQuestion: false,
-      showItem: false,
-      dataBase: {}, // 题目
-      pageDataList: [], // 分页过后的数据
       userInfo: null, // 用户信息
+      topicArr: new Array(), // 题目信息
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
-      minMoveX: 40, // 最小滑动距离
       endX: null, //手指停止滑动时X轴坐标
+      minMoveX: 40, // 最小滑动距离
       cout: 0, // 滑动计数器
       moveDir: null, // 滑动方向
       nodeWidth: null, // 滑块宽度
       startX: null, // 触摸的坐标
-      itemLength: 0 // item个数ï
+      itemLength: 0, // item个数
+      readIndex: 0,
+      answerList: [], // 已回答目录
+      maxScore: 0, // 最佳成绩
+      motifType: null, // 主题
+      isShowErrExplain: false, // 错误详解
+      isAutoSkip: false, // 自动跳转下一题
+
+      userTopicInfo: {
+        last_read_id: null, // 历史阅读位置题目id
+        total: null, // 题目总数
+        readIndex: null, // 当前阅读位置
+        collection: null // 是否收藏
+      }
     };
   },
   async created() {
     const vm = this;
-    vm.userInfo = JSON.parse(getStore("loginInfo"));
-    if (Object.keys(vm.$route.query).length > 0) {
-      if (Object.keys(vm.dataBase).length <= 0) {
-        api
-          .getDrivingOrder(vm.userInfo.user_id, vm.$route.query.type)
-          .then(res => {
-            vm.dataBase = res;
-            vm.setCurrentData(res.list, res.last_read_id, data => {
-              vm.showItem = true;
-              vm.showQuestion = true;
-              setTimeout(() => {
-                vm.initSlide();
-              }, 20);
-            });
-          });
-      } else {
-        setTimeout(() => {
-          vm.initSlide();
-        }, 20);
-      }
-    }
+    vm.initPage();
   },
   methods: {
+    initPage() {
+      let vm = this;
+      vm.userInfo = JSON.parse(getStore("loginInfo"));
+      vm.maxScore = vm.$route.query.score;
+      if (Object.keys(vm.$route.query).length > 0) {
+        api
+          .getDrivingWrongList(vm.userInfo.user_id, vm.$route.query.type)
+          .then(res => {
+            if (res.list.length <= 0) {
+              vm.$router.replace("questionBank");
+              return false;
+            }
+            vm.changeData(res.list, list => {
+              PAGENUM = list.length;
+              vm.topicArr = list;
+              vm.$nextTick(() => {
+                vm.initSlide();
+                vm.nextOne();
+                vm.setCollection();
+              });
+            });
+          });
+      }
+    },
+    // 组装数据
+    changeData(list, callback) {
+      let newList = [];
+      list.forEach(item => {
+        newList.push({
+          answer: item.question_info.answer,
+          explains: item.question_info.explains,
+          id: item.question_info.id,
+          is_collection: item.question_info.is_collection,
+          item1: item.question_info.item1,
+          item2: item.question_info.item2,
+          item3: item.question_info.item3,
+          item4: item.question_info.item4,
+          question: item.question_info.question,
+          url: item.question_info.url
+        });
+      });
+      callback && callback(newList);
+    },
     //选择模式
     changeType(val) {
       let self = this;
       self.active = val;
+      console.log(val);
+      if (self.active === "recite") {
+        self.showErrExplain(true);
+      }
     },
-    // 处理数据
-    setCurrentData(total, readId, callback) {
-      const vm = this;
-      let lock = true;
-      total.forEach((element, index) => {
-        if (element.id === readId + "") {
-          lock = false;
-          vm.setPageData(index, data => {
-            callback(data);
-          });
+    // 修改收藏状态
+    httpCollection(type) {
+      let vm = this;
+      let isCollection = type === 0 ? false : true;
+      let questionId = vm.topicArr[INDEX].id;
+      vm.topicArr.forEach((element, index) => {
+        if (element.id === questionId + "") {
+          element.is_collection = isCollection;
         }
       });
-      if (lock) {
-        vm.setPageData(0, data => {
-          callback(data);
+      api
+        .setCollection(
+          vm.userInfo.user_id,
+          vm.$route.query.type,
+          questionId,
+          type
+        )
+        .then(res => {
+          vm.setCollection();
         });
-      }
+    },
+    // 设置是否已收藏
+    setCollection() {
+      let vm = this;
+      vm.$refs.questionFooter.getCollection(
+        vm.topicArr[INDEX].is_collection || false,
+        vm.topicArr[INDEX].id
+      );
+    },
+    // 移除错题
+    delClk(id) {
+      let vm = this;
+      api
+        .setDrivingClearWrong(vm.userInfo.user_id, vm.topicArr[INDEX].id)
+        .then(res => {
+          this.$toast("移除成功");
+          vm.initPage();
+        });
     },
     resetModal() {
       const vm = this;
@@ -128,12 +211,11 @@ export default {
       const vm = this;
       vm.movebox = document.querySelector(".question-ul"); //滑动对象
       vm.slideItem = vm.movebox.querySelectorAll(".question-item"); //滑动对象item
-      // vm.itemLength = document.querySelector(".question-ul").children.length;
       vm.itemLength = PAGENUM;
       vm.nodeWidth = parseInt(
         window.getComputedStyle(vm.movebox.parentNode).width
       ); //滑动对象item的宽度
-      vm.movebox.style.width = vm.nodeWidth * (vm.itemLength - 1) + "px"; //设置滑动盒子width
+      vm.movebox.style.width = vm.nodeWidth * vm.itemLength + "px"; //设置滑动盒子width
       for (var i = 0; i < vm.itemLength; i++) {
         vm.slideItem[i].style.width = vm.nodeWidth + "px"; //设置滑动item的width，适应屏幕宽度
       }
@@ -155,7 +237,7 @@ export default {
         "translateX(" + (vm.endX + vm.moveX) + "px)"; //手指滑动时滑动对象随之滑动
     },
     // 滑动结束
-    boxTouchEnd(e) {
+    boxTouchEnd(e, type) {
       const vm = this;
       if (Math.abs(vm.moveX) <= 1) {
         return false;
@@ -186,7 +268,12 @@ export default {
         //手指向右滑动
       } else {
         //滑动到初始状态时返回false
+        if (INDEX <= 0) {
+          INDEX = 0;
+          vm.cout = 0;
+        }
         if (vm.cout == 0) {
+          vm.movebox.style.webkitTransform = "translateX(0px)";
           return false;
         } else {
           vm.movebox.style.webkitTransform =
@@ -195,36 +282,77 @@ export default {
           INDEX--;
         }
       }
+      vm.nextOne();
     },
-    // 设置分页数据
-    setPageData(index, callback) {
-      const vm = this;
-      INDEX = index;
-      let pagingArr = new Array();
-      for (let i = 0; i < PAGENUM; i++) {
-        INDEX++;
-        pagingArr.push(vm.dataBase.list[INDEX]);
-      }
-      callback(pagingArr);
-    },
-    // 保存阅读位置
-    driveimgRead(questionId) {
-      const vm = this;
-      console.log(vm.$route.query);
-      let params = {
-        user_id: vm.userInfo.user_id,
-        type: vm.$route.query.type,
-        question_id: questionId,
-        read_count: parseFloat(vm.$route.query.readCount)
-      };
-      console.log(params);
-      api.getDrivingRead(params).then(res => {
-        console.error(res);
+    // 跳转到某个题
+    gotoIndex(id) {
+      let vm = this;
+      vm.topicArr.forEach((element, index) => {
+        if (element.id === id + "") {
+          vm.readIndex = index;
+        }
       });
+      vm.movebox.style.webkitTransform =
+        "translateX(" + vm.readIndex * -vm.nodeWidth + "px)";
+      vm.cout = vm.readIndex;
+      INDEX = vm.readIndex;
+      vm.$refs.questionFooter.setFootData(100, vm.topicArr, vm.readIndex);
+    },
+    nextOne() {
+      let vm = this;
+      vm.$refs.questionFooter.setFootData(100, vm.topicArr, INDEX);
+      vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
+    },
+    // 答题
+    yetTipicList(id, qa, sa) {
+      let vm = this;
+      vm.topicArr.forEach((element, index) => {
+        if (element.id === id + "") {
+          if (qa + "" === sa + "") {
+            element.isAnswer = true;
+          } else {
+            element.isAnswer = false;
+          }
+        }
+      });
+      vm.nextOne();
+      if (qa + "" === sa + "") {
+        SCORE++;
+      }
+      vm.answerList.push({
+        question_id: id,
+        question_answer: qa,
+        submit_answer: sa
+      });
+    },
+    // 自动跳转下一题
+    autoSkip(type) {
+      let vm = this;
+      if (this.active === "recite") {
+        vm.isAutoSkip = true;
+      } else {
+        vm.isAutoSkip = type;
+      }
+    },
+    // 关闭试题详解
+    showErrExplain(val) {
+      let vm = this;
+      vm.isShowErrExplain = val;
+      console.log(val);
+    },
+    // 开启声音
+    openVoice(val) {
+      console.log(val);
+    },
+    // 设置主题
+    setMotif(type) {
+      let vm = this;
+      vm.motifType = type;
     }
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .question-content {
   position: absolute;
@@ -237,8 +365,11 @@ export default {
     flex-wrap: nowrap;
     height: 100%;
     .question-item {
-      min-width: 375px;
+      min-width: 320px;
     }
   }
+}
+.night {
+  background-color: #333;
 }
 </style>

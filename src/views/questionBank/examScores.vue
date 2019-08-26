@@ -6,8 +6,7 @@
     </div>
     <div class="content">
       <div class="nav">
-
-        <span class="iconfont">&#xe677;</span>
+        <span class="iconfont" @click="goback">&#xe677;</span>
         <span>本次成绩</span>
       </div>
       <div class="scoreBox">
@@ -15,20 +14,31 @@
         <p class="bold_font">马路杀手</p>
         <p class="normal_font">一定是路修歪了！不知路在何方！</p>
         <p class="m-30">
-          <span class="score">14</span>
+          <span class="score">
+            {{
+            score}}
+          </span>
           <span class="bold_font">分</span>
         </p>
         <ul>
           <li>
-            <p>04:44</p>
+            <p>
+              {{
+              showTime}}
+            </p>
             <span>考试用时</span>
           </li>
           <li>
-            <p>不合格</p>
+            <p>{{score<=OFFSCORE?'不合格':'及格'}}</p>
             <span>考试结果</span>
           </li>
           <li>
-            <p>97分</p>
+            <p>
+              {{
+              maxScore
+              }}
+              分
+            </p>
             <span>最佳成绩</span>
           </li>
         </ul>
@@ -39,7 +49,58 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      score: 0,
+      maxScore: 0,
+      time: null,
+      showTime: "",
+      OFFSCORE: 80, // 及格线
+      showTitle: {},
+      failList: [
+        {
+          title: "马路杀手",
+          cnt: "一定是路修歪了！不知路在何方！"
+        },
+        {
+          title: "马路杀手",
+          cnt: "东擦西挂，分不够扣"
+        }
+      ],
+      passList: [
+        {
+          title: "秋名山车神",
+          cnt: "秋名山跪求一战！"
+        },
+        {
+          title: "道路宗师",
+          cnt: "得心应手，技压群雄"
+        }
+      ]
+    };
+  },
+  mounted() {
+    let vm = this;
+    if (Object.keys(vm.$route.query).length > 0) {
+      vm.score = vm.$route.query.score;
+      vm.maxScore = vm.$route.query.maxCore;
+      vm.time = vm.$route.query.time;
+    }
+    if (vm.score < vm.OFFSCORE) {
+      vm.showTitle =
+        vm.failList[Math.floor(Math.random() * (vm.failList.length - 1))];
+    } else {
+      vm.showTitle =
+        vm.failList[Math.floor(Math.random() * (vm.passList.length - 1))];
+    }
+    let min = parseInt(vm.time / 60);
+    let sec = parseInt(vm.time - min * 60);
+    vm.showTime =
+      (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
+  },
+  methods:{
+    goback(){
+      this.$router.replace('questionBank')
+    }
   }
 };
 </script>

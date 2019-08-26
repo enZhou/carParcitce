@@ -11,47 +11,64 @@
           <span class="iconfont">&#xe606;</span>
           移除
         </div>
-
-        <div class="uncollected" v-if="uncollected === true">
+        <div class="uncollected" v-if="uncollected && collection === false" @click="isCollection(1)">
           <span class="iconfont">&#xe616;</span>
           收藏
         </div>
-        <div class="collected" v-if="collected === true">
+        <div class="collected" v-if="uncollected && collection === true" @click="isCollection(0)">
           <span class="iconfont">&#xe654;</span>
           已收藏
         </div>
       </div>
       <div class="option right">
-        <div class="correct f-c-2AC782">
+        <!-- <div class="correct f-c-2AC782">
           <span class="iconfont f-s-12 f-c-2AC782">&#xe634;</span>
           1
         </div>
         <div class="error f-c-FB6E52">
           <span class="iconfont f-s-12 f-c-FB6E52">&#xe61b;</span>
           1
-        </div>
+        </div> -->
         <div class="menu" @click="lookMenu">
           <span class="iconfont">&#xe685;</span>
-          {{(footData.readIndex || 0)+"/"+(footData.total || 0)}}
+          {{(readIndex || 0)+"/"+(total || 0)}}
         </div>
       </div>
     </div>
     <div class="mask" v-if="showOrHideMenu === true" @click="displayMenu"></div>
     <div class="questionlist" v-if="showOrHideMenu === true">
       <ul>
-        <li v-for="(item,index) in footData.list" :key="index+'foot'">
-          <div class="item" :class="item.is_collection===true?'yes':'no'">{{index+1}}</div>
+        <li
+          v-for="(item,index) in footDataList"
+          :key="item.id+'foot'"
+          @click="gotoIndex($event,item.id)"
+        >
+          <div v-if="footDataList.length!==100"
+            class="item"
+            :class="item.isRead===true && clickId === item.id?'yes green':item.isRead===true&&clickId !== item.id?'yes':clickId === item.id&&item.isRead!==true?'green':''"
+          >{{index+1}}</div>
+
+          <div v-else
+            class="item"
+            :class="item.isAnswer===true?'yes':item.isAnswer===false?'no':''"
+          >{{index+1}}</div>
         </li>
       </ul>
     </div>
   </div>
 </template>
 <script>
+import $ from "jquery";
 export default {
   data() {
     return {
       showOrHideMenu: false,
-      footData:{}
+      footDataList: [], // 渲染按钮
+      readIndex: null,
+      total: null,
+      collection: false,
+      clickId: null,
+      footDataDetail: {} // 渲染按钮
     };
   },
   props: {
@@ -66,15 +83,11 @@ export default {
     uncollected: {
       type: Boolean,
       default: false
-    },
-    collected: {
-      type: Boolean,
-      default: false
     }
   },
   mounted() {
     const vm = this;
-    console.log(vm.footData);
+    console.log(vm.uncollected && vm.collection === false)
   },
   methods: {
     // 交卷事件
@@ -101,10 +114,37 @@ export default {
       let self = this;
       self.showOrHideMenu = false;
     },
-    getFootData(data){
+    // 设置数据
+    setFootData(total, list, readIndex) {
       const vm = this;
-      vm.footData =data;
-      console.log(data)
+      vm.total = total;
+      vm.footDataList = list;
+      vm.readIndex = readIndex + 1;
+    },
+    // 是否收藏
+    getCollection(val,id) {
+      let vm = this;
+      vm.collection = val;
+      vm.clickId = id;
+    },
+    // 设置收藏
+    isCollection(type) {
+      let vm = this;
+      vm.$emit("httpCollection", type);
+    },
+    // 跳转到某个题目
+    gotoIndex(e, id) {
+      let vm = this;
+      vm.clickId = id;
+      vm.$emit("gotoIndex", id);
+    }
+  },
+  watch: {
+    total(val, old) {
+      console.log(val);
+    },
+    readIndex(val, old) {
+      console.log(val);
     }
   }
 };
@@ -123,13 +163,13 @@ export default {
   border-top: 1px solid #e1e0e0;
   display: flex;
   flex-wrap: nowrap;
-  justify-content: space-around;
+  justify-content: space-between;
   padding: 0 0.2rem;
   .option {
     width: 40%;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
   }
 }
@@ -190,5 +230,14 @@ export default {
       }
     }
   }
+}
+.collected {
+  span {
+    color: #24c27d;
+  }
+}
+.green {
+  background-color: #eee !important;
+  color: #24c27d !important;
 }
 </style>
