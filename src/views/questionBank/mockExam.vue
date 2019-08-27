@@ -285,7 +285,6 @@ export default {
     showErrExplain(val) {
       let vm = this;
       vm.isShowErrExplain = val;
-      console.log(val);
     },
     // 开启声音
     openVoice(val) {

@@ -120,7 +120,7 @@ export default {
           .getDrivingWrongList(vm.userInfo.user_id, vm.$route.query.type)
           .then(res => {
             if (res.list.length <= 0) {
-              vm.$router.replace("questionBank");
+              vm.$router.replace("/questionBank");
               return false;
             }
             vm.changeData(res.list, list => {
@@ -296,11 +296,11 @@ export default {
         "translateX(" + vm.readIndex * -vm.nodeWidth + "px)";
       vm.cout = vm.readIndex;
       INDEX = vm.readIndex;
-      vm.$refs.questionFooter.setFootData(100, vm.topicArr, vm.readIndex);
+      vm.$refs.questionFooter.setFootData(vm.topicArr.length, vm.topicArr, vm.readIndex);
     },
     nextOne() {
       let vm = this;
-      vm.$refs.questionFooter.setFootData(100, vm.topicArr, INDEX);
+      vm.$refs.questionFooter.setFootData(vm.topicArr.length, vm.topicArr, INDEX);
       vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
     },
     // 答题
