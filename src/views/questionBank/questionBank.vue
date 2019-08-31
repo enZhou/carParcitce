@@ -45,7 +45,10 @@
           <!-- 顺序练习 -->
           <div class="practice_box">
             <!-- 我的错题 -->
-            <router-link class="errorTipic" :to="'/errorQuestion/?type='+getDataType+'&readCount='+dlData.read_count">
+            <router-link
+              class="errorTipic"
+              :to="'/errorQuestion/?type='+getDataType"
+            >
               <div class="error_img">
                 <img src="../../assets/img/myError.png" alt srcset />
               </div>
@@ -80,7 +83,10 @@
                 <li></li>
                 <li></li>
               </ul>
-              <router-link class="tipic_round" :to="'/questionOrder/?type='+getDataType+'&readCount='+dlData.read_count">
+              <router-link
+                class="tipic_round"
+                :to="'/questionOrder/?type='+getDataType+'&readCount='+dlData.read_count"
+              >
                 <div class="tipic_round_green">
                   <p>顺序练习</p>
                   <p>{{dlData.read_count || 0}}/{{dlData.total_count || 0}}</p>
@@ -100,8 +106,11 @@
           </div>
           <!-- 模拟考试 -->
           <div class="exam_box">
-            <!-- 我的错题 -->
-            <router-link class="errorTipic" :to="'/questionCollect'">
+            <!-- 我的收藏 -->
+            <router-link
+              class="errorTipic"
+              :to="'/questionCollect?type='+getDataType"
+            >
               <div class="error_img">
                 <img src="../../assets/img/myCollect.png" alt srcset />
               </div>
@@ -136,7 +145,10 @@
                 <li></li>
               </ul>
 
-              <router-link class="exam_round" :to="'/mockExam/?type='+getDataType+'&score='+dlData.score">
+              <router-link
+                class="exam_round"
+                :to="'/mockExam/?type='+getDataType+'&score='+dlData.score"
+              >
                 <div class="tipic_round_purple">
                   <p>模拟考试</p>
                   <p>{{dlData.score || 0}}</p>
@@ -179,7 +191,7 @@ export default {
         score: null
       }, // 驾驶证数据
       userInfo: null, // 用户信息
-      getDataType:null, // 请求类型type
+      getDataType: null // 请求类型type
     };
   },
   async created() {
@@ -199,15 +211,15 @@ export default {
       let vm = this;
       vm.bankType = val;
       vm.getMainData(vm.userInfo.user_id);
-      if(val ===1){
+      if (val === 1) {
         vm.dlType = 1;
       }
     },
     // 选择驾驶证类型
     changeDlType(val) {
       const vm = this;
-      if(vm.bankType == 1){
-        return
+      if (vm.bankType == 1) {
+        return;
       }
       vm.dlType = val;
       vm.getMainData(vm.userInfo.user_id);

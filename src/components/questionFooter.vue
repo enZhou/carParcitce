@@ -11,7 +11,11 @@
           <span class="iconfont">&#xe606;</span>
           移除
         </div>
-        <div class="uncollected" v-if="uncollected && collection === false" @click="isCollection(1)">
+        <div
+          class="uncollected"
+          v-if="uncollected && collection === false"
+          @click="isCollection(1)"
+        >
           <span class="iconfont">&#xe616;</span>
           收藏
         </div>
@@ -21,14 +25,14 @@
         </div>
       </div>
       <div class="option right">
-        <!-- <div class="correct f-c-2AC782">
+        <div class="correct f-c-2AC782" v-if="isMockExam">
           <span class="iconfont f-s-12 f-c-2AC782">&#xe634;</span>
-          1
+          {{replyNum}}
         </div>
-        <div class="error f-c-FB6E52">
+        <div class="error f-c-FB6E52" v-if="isMockExam">
           <span class="iconfont f-s-12 f-c-FB6E52">&#xe61b;</span>
-          1
-        </div> -->
+          {{errorNum}}
+        </div>
         <div class="menu" @click="lookMenu">
           <span class="iconfont">&#xe685;</span>
           {{(readIndex || 0)+"/"+(total || 0)}}
@@ -43,12 +47,14 @@
           :key="item.id+'foot'"
           @click="gotoIndex($event,item.id)"
         >
-          <div v-if="footDataList.length!==100"
+          <div
+            v-if="footDataList.length!==100"
             class="item"
             :class="item.isRead===true && clickId === item.id?'yes green':item.isRead===true&&clickId !== item.id?'yes':clickId === item.id&&item.isRead!==true?'green':''"
           >{{index+1}}</div>
 
-          <div v-else
+          <div
+            v-else
             class="item"
             :class="item.isAnswer===true?'yes':item.isAnswer===false?'no':''"
           >{{index+1}}</div>
@@ -68,6 +74,9 @@ export default {
       total: null,
       collection: false,
       clickId: null,
+      isMockExam: false,
+      replyNum: 0, // 对
+      errorNum: 0, // 错
       footDataDetail: {} // 渲染按钮
     };
   },
@@ -87,7 +96,6 @@ export default {
   },
   mounted() {
     const vm = this;
-    console.log(vm.uncollected && vm.collection === false)
   },
   methods: {
     // 交卷事件
@@ -99,6 +107,10 @@ export default {
     delClk() {
       let self = this;
       self.$emit("delClk");
+    },
+    isisMockExamFnc(val) {
+      let vm = this;
+      vm.isMockExam = val;
     },
     // 展示题目菜单
     lookMenu() {
@@ -122,7 +134,7 @@ export default {
       vm.readIndex = readIndex + 1;
     },
     // 是否收藏
-    getCollection(val,id) {
+    getCollection(val, id) {
       let vm = this;
       vm.collection = val;
       vm.clickId = id;
@@ -131,6 +143,11 @@ export default {
     isCollection(type) {
       let vm = this;
       vm.$emit("httpCollection", type);
+    },
+    setNum(num1 = 0, num2 = 0) {
+      let vm = this;
+      vm.replyNum += num1;
+      vm.errorNum += num2;
     },
     // 跳转到某个题目
     gotoIndex(e, id) {

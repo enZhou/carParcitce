@@ -11,11 +11,13 @@
     <object
       v-if="currentData.url&&!judgeSwfFiles(currentData.url)"
       classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-      :codebase="currentData.url"
+      type="MIME_type"
+      :data="currentData.url"
     >
       <param name="SRC" :value="currentData.url" />
       <embed :src="currentData.url" />
     </object>
+
     <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption(1)">
         <span
@@ -73,8 +75,16 @@
         <div class="info_title">
           <span :class="isMotifType=='night'?'night':''" class="title">试题详解</span>
         </div>
-        <div class="info_content" :class="isMotifType=='night'?'night':''" v-html="currentData.explains"></div>
-        <div class="info_content" :class="isMotifType=='night'?'night':''" v-html="currentData.explains"></div>
+        <div
+          class="info_content"
+          :class="isMotifType=='night'?'night':''"
+          v-html="currentData.explains"
+        ></div>
+        <div
+          class="info_content"
+          :class="isMotifType=='night'?'night':''"
+          v-html="currentData.explains"
+        ></div>
       </div>
     </div>
   </div>
@@ -138,8 +148,13 @@ export default {
       vm.answer = answer;
       vm.isInfo = true;
       vm.showErr = true;
-      vm.$emit("driveimgRead", vm.currentData.id,answer);
-      vm.$emit("yetTipicList", vm.currentData.id,vm.currentData.answer,answer);
+      vm.$emit("driveimgRead", vm.currentData.id, answer);
+      vm.$emit(
+        "yetTipicList",
+        vm.currentData.id,
+        vm.currentData.answer,
+        answer
+      );
       vm.currentData.currentType = true;
     },
     getDocement(className) {

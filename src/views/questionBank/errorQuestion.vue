@@ -19,14 +19,6 @@
         @touchend="boxTouchEnd"
       >
         <li class="question-item" v-for="(item,index) in topicArr" :key="index">
-          <!-- <question
-            :topicInfo="item"
-            :info="true"
-            :isShowErrExplain="isShowErrExplain"
-            :motifType="motifType"
-            ref="question"
-            @yetTipicList="yetTipicList"
-          ></question>-->
           <question
             v-if="active === 'answer'"
             :topicInfo="item"

@@ -107,6 +107,7 @@ export default {
           vm.$nextTick(() => {
             vm.initSlide();
             vm.nextOne();
+            vm.$refs.questionFooter.isisMockExamFnc(true);
           });
         });
     }
@@ -141,7 +142,10 @@ export default {
           JSON.stringify(vm.answerList)
         )
         .then(res => {
-          vm.$router.push({ name: "examScores", query: { time:time, score:SCORE,maxCore:vm.maxScore } }); // 路径名name
+          vm.$router.push({
+            name: "examScores",
+            query: { time: time, score: SCORE, maxCore: vm.maxScore }
+          }); // 路径名name
         });
     },
     //选择模式
@@ -257,8 +261,10 @@ export default {
         if (element.id === id + "") {
           if (qa + "" === sa + "") {
             element.isAnswer = true;
+            vm.$refs.questionFooter.setNum(1, 0);
           } else {
             element.isAnswer = false;
+            vm.$refs.questionFooter.setNum(0, 1);
           }
         }
       });

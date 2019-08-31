@@ -159,6 +159,9 @@ export default {
     // 获取错题列表
     setDrivingClearWrong(id,wang_id) {
         return axiosGet(`driving/clearWrong?user_id=${id}&wang_id=${wang_id}`);
+    },
+    // 获取收藏列表列表
+   getCollectionList(id,type) {
+        return axiosGet(`Driving/collectionList?user_id=${id}&type=${type}`);
     }
-
 }
