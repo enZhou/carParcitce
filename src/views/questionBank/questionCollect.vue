@@ -93,7 +93,8 @@ export default {
         total: null, // 题目总数
         readIndex: null, // 当前阅读位置
         collection: null // 是否收藏
-      }
+      },
+      saveShowErrExplain: false
     };
   },
   async created() {
@@ -139,18 +140,19 @@ export default {
           item3: item.question_info.item3,
           item4: item.question_info.item4,
           question: item.question_info.question,
-          url: item.question_info.url,
+          url: item.question_info.url
         });
       });
       callback && callback(newList);
     },
     //选择模式
     changeType(val) {
-      let self = this;
-      self.active = val;
-      console.log(val);
-      if (self.active === "recite") {
-        self.showErrExplain(true);
+      let vm = this;
+      vm.active = val;
+      if (vm.active === "recite") {
+        vm.isShowErrExplain = true;
+      } else {
+        vm.isShowErrExplain = vm.saveShowErrExplain;
       }
     },
     // 修改收藏状态
@@ -326,7 +328,7 @@ export default {
     showErrExplain(val) {
       let vm = this;
       vm.isShowErrExplain = val;
-      console.log(val);
+      vm.saveShowErrExplain = val;
     },
     // 开启声音
     openVoice(val) {

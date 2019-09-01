@@ -96,7 +96,8 @@ export default {
         total: null, // 题目总数
         readIndex: null, // 当前阅读位置
         collection: null // 是否收藏
-      }
+      },
+      saveShowErrExplain: false
     };
   },
   async created() {
@@ -268,10 +269,12 @@ export default {
 
     //选择模式
     changeType(val) {
-      let self = this;
-      self.active = val;
-      if (self.active === "recite") {
-        self.showErrExplain(true);
+      let vm = this;
+      vm.active = val;
+      if (vm.active === "recite") {
+        vm.isShowErrExplain = true;
+      } else {
+        vm.isShowErrExplain = vm.saveShowErrExplain;
       }
     },
     // 处理数据
@@ -328,7 +331,7 @@ export default {
           element.isRead = true;
           if (element.answer === answer + "") {
             isAnswer = true;
-          }else{
+          } else {
             vm.setDrivingWrong(questionId);
           }
         }
@@ -405,8 +408,8 @@ export default {
     // 关闭试题详解
     showErrExplain(val) {
       let vm = this;
+      vm.saveShowErrExplain = val;
       vm.isShowErrExplain = val;
-      console.log(val);
     },
     // 开启声音
     openVoice(val) {
@@ -421,14 +424,8 @@ export default {
     setDrivingWrong(questionId) {
       let vm = this;
       api
-        .setDrivingWrong(
-          vm.userInfo.user_id,
-          vm.$route.query.type,
-          questionId
-        )
-        .then(res => {
-          
-        });
+        .setDrivingWrong(vm.userInfo.user_id, vm.$route.query.type, questionId)
+        .then(res => {});
     }
   }
 };
