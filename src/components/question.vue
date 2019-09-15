@@ -8,15 +8,12 @@
       <span :class="isMotifType=='night'?'night':''">{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
-    <object
+    <video
       v-if="currentData.url&&!judgeSwfFiles(currentData.url)"
-      classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-      type="MIME_type"
-      :data="currentData.url"
-    >
-      <param name="SRC" :value="currentData.url" />
-      <embed :src="currentData.url" />
-    </object>
+      :src="currentData.url"
+      controls="controls"
+      style="width:100%"
+    >您的浏览器不支持 video 标签。</video>
 
     <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption(1)">
@@ -169,7 +166,7 @@ export default {
       vm.answerType = false;
     },
     judgeSwfFiles(file) {
-      if (file.indexOf(".swf") == 0) {
+      if (file.indexOf(".mp4") == 0) {
         return true;
       } else {
         return false;
