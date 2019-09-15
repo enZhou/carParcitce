@@ -100,7 +100,7 @@ export default {
       let vm = this;
       vm.userInfo = JSON.parse(getStore("loginInfo"));
       vm.topicCacheData = JSON.parse(
-        getStore(`vehicleList${vm.$route.query.type}`)
+        getStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`)
       );
       if (type) {
         if (Object.keys(vm.$route.query).length > 0) {
@@ -109,7 +109,7 @@ export default {
             .then(res => {
               if (!vm.topicCacheData || vm.topicCacheData.length <= 0) {
                 vm.topicCacheData = res.list;
-                setStore(`vehicleList${vm.$route.query.type}`, res.list);
+                setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, res.list);
               }
               vm.userTopicInfo = {
                 last_read_id: res.last_read_id,
@@ -324,8 +324,8 @@ export default {
           }
         }
       });
-      removeStore(`vehicleList${vm.$route.query.type}`);
-      setStore(`vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      removeStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`);
+      setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, vm.topicCacheData);
 
       api
         .getDrivingRead(
@@ -374,8 +374,8 @@ export default {
           element.is_collection = isCollection;
         }
       });
-      removeStore(`vehicleList${vm.$route.query.type}`);
-      setStore(`vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      removeStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`);
+      setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, vm.topicCacheData);
       api
         .setCollection(
           vm.userInfo.user_id,
