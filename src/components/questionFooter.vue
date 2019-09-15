@@ -154,6 +154,7 @@ export default {
       let vm = this;
       vm.clickId = id;
       vm.$emit("gotoIndex", id);
+      vm.showOrHideMenu = false;
     }
   },
   watch: {

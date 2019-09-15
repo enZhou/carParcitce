@@ -1,17 +1,8 @@
 <!-- 模拟考试 -->
 <template>
   <div>
-    <commonPage
-      ref="commonPage"
-      :active="active"
-      :showType="showType"
-      @changeModal="changeType"
-      @autoSkip="autoSkip"
-      @showErrExplain="showErrExplain"
-      @openVoice="openVoice"
-      @setMotif="setMotif"
-    ></commonPage>
-    <div class="question-content" :class="motifType=='night'?'night':''">
+    <commonPage ref="commonPage" :active="active" :showType="showType" @changeModal="changeType"></commonPage>
+    <div class="question-content">
       <ul
         class="question-ul"
         @touchstart="boxTouchStart"
@@ -23,15 +14,15 @@
             v-if="active === 'answer'"
             :topicInfo="item"
             :info="false"
+            @yetTipicList="yetTipicList"
             :isShowErrExplain="isShowErrExplain"
-            :motifType="motifType"
             ref="question"
           ></question>
           <question
             v-if="active === 'recite'"
             :topicInfo="item"
+            @yetTipicList="yetTipicList"
             :isShowErrExplain="isShowErrExplain"
-            :motifType="motifType"
             :info="true"
             ref="question"
           ></question>
@@ -86,10 +77,8 @@ export default {
       readIndex: 0,
       answerList: [], // 已回答目录
       maxScore: 0, // 最佳成绩
-      motifType: null, // 主题
       isShowErrExplain: false, // 错误详解
-      isAutoSkip: false, // 自动跳转下一题
-
+      saveShowErrExplain: false,
       userTopicInfo: {
         last_read_id: null, // 历史阅读位置题目id
         total: null, // 题目总数
@@ -150,9 +139,11 @@ export default {
     changeType(val) {
       let self = this;
       self.active = val;
-      console.log(val);
+      console.log(1)
       if (self.active === "recite") {
-        self.showErrExplain(true);
+        self.isShowErrExplain = true;
+      } else {
+        self.isShowErrExplain = self.saveShowErrExplain;
       }
     },
     // 修改收藏状态
@@ -288,21 +279,33 @@ export default {
         "translateX(" + vm.readIndex * -vm.nodeWidth + "px)";
       vm.cout = vm.readIndex;
       INDEX = vm.readIndex;
-      vm.$refs.questionFooter.setFootData(vm.topicArr.length, vm.topicArr, vm.readIndex);
+      vm.$refs.questionFooter.setFootData(
+        vm.topicArr.length,
+        vm.topicArr,
+        vm.readIndex
+      );
     },
     nextOne() {
       let vm = this;
-      vm.$refs.questionFooter.setFootData(vm.topicArr.length, vm.topicArr, INDEX);
+      vm.$refs.questionFooter.setFootData(
+        vm.topicArr.length,
+        vm.topicArr,
+        INDEX
+      );
       vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
     },
     // 答题
     yetTipicList(id, qa, sa) {
       let vm = this;
+      console.log('12313123')
+      vm.isShowErrExplain = true; // 错误详解
       vm.topicArr.forEach((element, index) => {
         if (element.id === id + "") {
           if (qa + "" === sa + "") {
+            vm.saveShowErrExplain = true;
             element.isAnswer = true;
           } else {
+            vm.saveShowErrExplain = false;
             element.isAnswer = false;
           }
         }
@@ -316,30 +319,6 @@ export default {
         question_answer: qa,
         submit_answer: sa
       });
-    },
-    // 自动跳转下一题
-    autoSkip(type) {
-      let vm = this;
-      if (this.active === "recite") {
-        vm.isAutoSkip = true;
-      } else {
-        vm.isAutoSkip = type;
-      }
-    },
-    // 关闭试题详解
-    showErrExplain(val) {
-      let vm = this;
-      vm.isShowErrExplain = val;
-      console.log(val);
-    },
-    // 开启声音
-    openVoice(val) {
-      console.log(val);
-    },
-    // 设置主题
-    setMotif(type) {
-      let vm = this;
-      vm.motifType = type;
     }
   }
 };
@@ -356,6 +335,7 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 100%;
+    transition: all 1s;
     .question-item {
       min-width: 320px;
     }

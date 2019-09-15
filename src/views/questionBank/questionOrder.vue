@@ -2,17 +2,9 @@
 <template>
   <div>
     <!-- tab切换操作 -->
-    <commonPage
-      :active="active"
-      :showType="showType"
-      @changeModal="changeType"
-      @autoSkip="autoSkip"
-      @showErrExplain="showErrExplain"
-      @openVoice="openVoice"
-      @setMotif="setMotif"
-    >
+    <commonPage :active="active" :showType="showType" @changeModal="changeType">
       <template slot="content">
-        <div class="question-content" :class="motifType=='night'?'night':''">
+        <div class="question-content">
           <ul
             class="question-ul"
             id="question-ul"
@@ -26,7 +18,6 @@
                 :topicInfo="item"
                 :info="false"
                 :isShowErrExplain="isShowErrExplain"
-                :motifType="motifType"
                 ref="question"
                 @driveimgRead="driveimgRead"
               ></question>
@@ -34,7 +25,6 @@
                 v-if="active === 'recite'"
                 :topicInfo="item"
                 :isShowErrExplain="isShowErrExplain"
-                :motifType="motifType"
                 :info="true"
                 ref="question"
                 @driveimgRead="driveimgRead"
@@ -86,9 +76,7 @@ export default {
       moveDir: null, // 滑动方向
       nodeWidth: null, // 滑块宽度
       startX: null, // 触摸的坐标
-      motifType: null, // 主题
       isShowErrExplain: false, // 错误详解
-      isAutoSkip: false, // 自动跳转下一题
       pageDataList: [], // 分页过后的数据
       topicCacheData: [], // 缓存数据
       userTopicInfo: {
@@ -187,18 +175,15 @@ export default {
         "translateX(" + (vm.endX + vm.moveX) + "px)"; //手指滑动时滑动对象随之滑动
     },
     // 滑动结束
-    boxTouchEnd(e, type) {
+    boxTouchEnd(e) {
       const vm = this;
-      if (vm.isAutoSkip && type === true) {
-        vm.moveX = -10;
-      } else {
-        if (Math.abs(vm.moveX) <= 1) {
-          return false;
-        }
-        if (Math.abs(vm.moveX) < vm.minMoveX) {
-          vm.movebox.style.webkitTransform = "translateX(" + vm.endX + "px)"; //手指滑动时滑动对象随之滑动
-          return false;
-        }
+
+      if (Math.abs(vm.moveX) <= 1) {
+        return false;
+      }
+      if (Math.abs(vm.moveX) < vm.minMoveX) {
+        vm.movebox.style.webkitTransform = "translateX(" + vm.endX + "px)"; //手指滑动时滑动对象随之滑动
+        return false;
       }
       vm.moveDir = vm.moveX < 0 ? true : false; //滑动方向大于0表示向左滑动，小于0表示向右滑动
       if (vm.cout == 0 && vm.moveX > 0) {
@@ -317,6 +302,7 @@ export default {
     // 保存阅读位置
     driveimgRead(questionId, answer) {
       const vm = this;
+      vm.isShowErrExplain = true;
       let params = {
         user_id: vm.userInfo.user_id,
         type: vm.$route.query.type,
@@ -331,17 +317,16 @@ export default {
           element.isRead = true;
           if (element.answer === answer + "") {
             isAnswer = true;
+            vm.saveShowErrExplain = true;
           } else {
+            vm.saveShowErrExplain = false;
             vm.setDrivingWrong(questionId);
           }
         }
       });
       removeStore(`vehicleList${vm.$route.query.type}`);
       setStore(`vehicleList${vm.$route.query.type}`, vm.topicCacheData);
-      if (vm.isAutoSkip && isAnswer) {
-        vm.boxTouchEnd(false, true);
-      }
-      // vm.initPage(false);
+
       api
         .getDrivingRead(
           vm.userInfo.user_id,
@@ -364,6 +349,12 @@ export default {
         vm.pageDataList = data;
       });
       vm.setCollection();
+
+      vm.$refs.questionFooter.setFootData(
+        vm.userTopicInfo.total,
+        vm.topicCacheData,
+        vm.userTopicInfo.readIndex
+      );
     },
     // 设置是否已收藏
     setCollection() {
@@ -396,30 +387,6 @@ export default {
           vm.setCollection();
         });
     },
-    // 自动跳转下一题
-    autoSkip(type) {
-      let vm = this;
-      if (this.active === "recite") {
-        vm.isAutoSkip = true;
-      } else {
-        vm.isAutoSkip = type;
-      }
-    },
-    // 关闭试题详解
-    showErrExplain(val) {
-      let vm = this;
-      vm.saveShowErrExplain = val;
-      vm.isShowErrExplain = val;
-    },
-    // 开启声音
-    openVoice(val) {
-      console.log(val);
-    },
-    // 设置主题
-    setMotif(type) {
-      let vm = this;
-      vm.motifType = type;
-    },
     //提交错题
     setDrivingWrong(questionId) {
       let vm = this;
@@ -442,6 +409,7 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 100%;
+    transition: all 1s;
     .question-item {
       width: 100%;
       min-width: 320px;

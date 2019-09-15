@@ -25,50 +25,12 @@
         <slot name="txt"></slot>
       </div>
       <div>
-        <span v-if="showSetting" @click="showSetMenu = !showSetMenu">设置</span>
+        <!-- <span v-if="showSetting" @click="showSetMenu = !showSetMenu">设置</span> -->
       </div>
     </div>
     <!-- tab内容  -->
     <div class="tab-body" v-if="showType === 'tab'">
       <slot name="content"></slot>
-    </div>
-    <div class="mask" v-if="showSetMenu == true" @click="showSetMenu = !showSetMenu"></div>
-    <div class="setContent" v-show="showSetMenu == true">
-      <ul>
-        <li>
-          <span class="title">答对跳转下一题</span>
-          <input class="switch switch-anim" @change="autoSkip($event)" type="checkbox" />
-        </li>
-        <li>
-          <span class="title">答错展示试题详解</span>
-          <input class="switch switch-anim" @change="showErrExplain($event)" type="checkbox" />
-        </li>
-        <!-- <li>
-          <span class="title">提示声音</span>
-          <input class="switch switch-anim" @change="openVoice($event)" type="checkbox" />
-        </li>-->
-        <li>
-          <span class="title">主题切换</span>
-          <div class="setting-motif">
-            <div class="criteria" @click="changeMotif('criteria')">
-              <span class="iconfont motif-box" :class="motif == 'criteria'?'active':''">&#xe64c;</span>
-              <span>标准</span>
-            </div>
-            <div @click="changeMotif('night')">
-              <span class="iconfont motif-box" :class="motif == 'night'?'active':''">&#xe74d;</span>
-              <span>夜间</span>
-            </div>
-          </div>
-        </li>
-        <!-- <li>
-          <span class="title">字体大小</span>
-          <div class="fontList">
-            <span class="font small">A标准</span>
-            <span class="font middle">A大号</span>
-            <span class="font big">A超大号</span>
-          </div>
-        </li>-->
-      </ul>
     </div>
   </div>
 </template>
@@ -90,7 +52,6 @@ export default {
         }
       ],
       times: "",
-      showSetMenu: false,
       showContent: true,
       sumTimeOut: 0, // 倒计时
       motif: "criteria" //主题
@@ -126,7 +87,6 @@ export default {
     goBack() {
       let vm = this;
       window.history.go(-1);
-      vm.showSetMenu = false;
     },
     changemodal(type) {
       let self = this;
@@ -152,27 +112,6 @@ export default {
       let vm = this;
       return timeOutVal * 60 - vm.sumTimeOut;
     },
-    // 自动跳转下一题
-    autoSkip(e) {
-      let vm = this;
-      vm.$emit("autoSkip", $(e.target).is(":checked"));
-    },
-    // 显示试题详解
-    showErrExplain(e) {
-      const vm = this;
-      vm.$emit("showErrExplain", $(e.target).is(":checked"));
-    },
-    // 声音
-    openVoice(e) {
-      let vm = this;
-      vm.$emit("openVoice", $(e.target).is(":checked"));
-    },
-    // 切换主题
-    changeMotif(type) {
-      let vm = this;
-      vm.motif = type;
-      vm.$emit("setMotif", type);
-    }
   }
 };
 </script>

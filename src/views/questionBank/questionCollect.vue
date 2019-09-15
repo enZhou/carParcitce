@@ -6,12 +6,9 @@
       :active="active"
       :showType="showType"
       @changeModal="changeType"
-      @autoSkip="autoSkip"
       @showErrExplain="showErrExplain"
-      @openVoice="openVoice"
-      @setMotif="setMotif"
     ></commonPage>
-    <div class="question-content" :class="motifType=='night'?'night':''">
+    <div class="question-content">
       <ul
         class="question-ul"
         @touchstart="boxTouchStart"
@@ -24,14 +21,12 @@
             :topicInfo="item"
             :info="false"
             :isShowErrExplain="isShowErrExplain"
-            :motifType="motifType"
             ref="question"
           ></question>
           <question
             v-if="active === 'recite'"
             :topicInfo="item"
             :isShowErrExplain="isShowErrExplain"
-            :motifType="motifType"
             :info="true"
             ref="question"
           ></question>
@@ -84,10 +79,7 @@ export default {
       readIndex: 0,
       answerList: [], // 已回答目录
       maxScore: 0, // 最佳成绩
-      motifType: null, // 主题
       isShowErrExplain: false, // 错误详解
-      isAutoSkip: false, // 自动跳转下一题
-
       userTopicInfo: {
         last_read_id: null, // 历史阅读位置题目id
         total: null, // 题目总数
@@ -315,30 +307,12 @@ export default {
         submit_answer: sa
       });
     },
-    // 自动跳转下一题
-    autoSkip(type) {
-      let vm = this;
-      if (this.active === "recite") {
-        vm.isAutoSkip = true;
-      } else {
-        vm.isAutoSkip = type;
-      }
-    },
     // 关闭试题详解
     showErrExplain(val) {
       let vm = this;
       vm.isShowErrExplain = val;
       vm.saveShowErrExplain = val;
     },
-    // 开启声音
-    openVoice(val) {
-      console.log(val);
-    },
-    // 设置主题
-    setMotif(type) {
-      let vm = this;
-      vm.motifType = type;
-    }
   }
 };
 </script>
