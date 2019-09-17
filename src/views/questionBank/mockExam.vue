@@ -1,12 +1,8 @@
 <!-- 模拟考试 -->
 <template>
   <div>
-    <commonPage
-      ref="commonPage"
-      :showType="showType"
-      @showErrExplain="showErrExplain"
-    ></commonPage>
-    <div class="question-content" >
+    <commonPage ref="commonPage" :showType="showType"></commonPage>
+    <div class="question-content">
       <ul
         class="question-ul"
         @touchstart="boxTouchStart"
@@ -17,7 +13,7 @@
           <question
             :topicInfo="item"
             :info="true"
-            :isShowErrExplain="isShowErrExplain"
+            :isShowErrExplain="true"
             ref="question"
             @yetTipicList="yetTipicList"
           ></question>
@@ -54,7 +50,7 @@ import { getStore } from "../../common/util.js";
 var INDEX = 0;
 var PAGENUM = 100; // 每页条数
 var SCORE = 0; // 分数
-const OFFSCORE = 80; // 及格线
+const OFFSCORE = 90; // 及格线
 export default {
   components: {
     commonPage,
@@ -85,12 +81,16 @@ export default {
       itemLength: 0, // item个数
       readIndex: 0,
       answerList: [], // 已回答目录
-      maxScore: 0, // 最佳成绩
-      isShowErrExplain: false, // 错误详解
+      maxScore: 0 // 最佳成绩
     };
   },
   async created() {
     const vm = this;
+    if (vm.$route.query.type == 1) {
+      PAGENUM = 100;
+    } else {
+      PAGENUM = 50;
+    }
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     vm.maxScore = vm.$route.query.score;
     if (Object.keys(vm.$route.query).length > 0) {
@@ -110,13 +110,14 @@ export default {
     // 交卷弹窗事件
     submitClk: function() {
       let self = this;
+      console.log(self.$route.query.type);
       // 你本次做对14道题，做错11道题 考试得分14分，考试不合格，确认
       self.isShow = true;
       self.dialogTitle = `成绩${SCORE > OFFSCORE ? "及格" : "不及格"}`;
       self.dialogContent = `你本次做对${SCORE}道题，做错${self.answerList
-        .length - SCORE}道题 考试得分${SCORE}分，考试${
-        SCORE > OFFSCORE ? "及格" : "不及格"
-      }，确认`;
+        .length - SCORE}道题 考试得分${
+        self.$route.query.type == 4 ? SCORE * 2 : SCORE
+      }分，考试${SCORE > OFFSCORE ? "及格" : "不及格"}，确认`;
     },
     // 弹窗取消
     close: function() {
@@ -241,11 +242,12 @@ export default {
         "translateX(" + vm.readIndex * -vm.nodeWidth + "px)";
       vm.cout = vm.readIndex;
       INDEX = vm.readIndex;
-      vm.$refs.questionFooter.setFootData(100, vm.topicArr, vm.readIndex);
+      vm.$refs.questionFooter.setFootData(PAGENUM, vm.topicArr, vm.readIndex);
+      vm.$refs.questionFooter.getCollection(null, id);
     },
     nextOne() {
       let vm = this;
-      vm.$refs.questionFooter.setFootData(100, vm.topicArr, INDEX);
+      vm.$refs.questionFooter.setFootData(PAGENUM, vm.topicArr, INDEX);
       vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
     },
     // 答题
@@ -271,12 +273,7 @@ export default {
         question_answer: qa,
         submit_answer: sa
       });
-    },
-    // 关闭试题详解
-    showErrExplain(val) {
-      let vm = this;
-      vm.isShowErrExplain = val;
-    },
+    }
   }
 };
 </script>
@@ -292,6 +289,7 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 100%;
+    transition: all 1s;
     .question-item {
       min-width: 320px;
     }

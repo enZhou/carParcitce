@@ -2,13 +2,9 @@
 <template>
   <div class="dialog">
     <div class="dialog-cover back" v-if="isShow" @click="close"></div>
-    <div
-      class="dialog-content"
-      :style="{
+    <div class="dialog-content" :style="{
         width: dialogWidth + '%'
-      }"
-      v-if="isShow"
-    >
+      }" v-if="isShow">
       <div class="content">
         <div class="dialog_head back">
           <!--弹窗头部 title-->
@@ -21,7 +17,7 @@
       </div>
       <!--弹窗关闭按钮-->
       <div class="foot">
-        <div class="btn close" @click="close">{{ closeBtnName }}</div>
+        <div class="btn close" @click="close" v-if="showClose">{{ closeBtnName }}</div>
         <div class="btn ok" @click="OK">{{ okBtnName }}</div>
       </div>
     </div>
@@ -55,14 +51,17 @@ export default {
     okBtnName: {
       // 确认按钮名称
       type: String,
-      required: true,
       default: "确认"
     },
     closeBtnName: {
       // 关闭按钮名称
       type: String,
-      required: true,
       default: "取消"
+    },
+    showClose: {
+      // 是否显示关闭按钮
+      type: Boolean,
+      default: true
     }
   },
   methods: {
@@ -121,7 +120,7 @@ export default {
     height: 1rem;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: center;
     border-top: 1px solid #f1f1f1;
     .btn {
       width: 50%;

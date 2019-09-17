@@ -109,7 +109,10 @@ export default {
             .then(res => {
               if (!vm.topicCacheData || vm.topicCacheData.length <= 0) {
                 vm.topicCacheData = res.list;
-                setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, res.list);
+                setStore(
+                  `${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`,
+                  res.list
+                );
               }
               vm.userTopicInfo = {
                 last_read_id: res.last_read_id,
@@ -122,6 +125,8 @@ export default {
                   vm.pageDataList = data;
                   vm.$nextTick(() => {
                     vm.initSlide();
+                    vm.movebox.style.webkitTransform =
+                      "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
                   });
                 }
               );
@@ -177,7 +182,6 @@ export default {
     // 滑动结束
     boxTouchEnd(e) {
       const vm = this;
-
       if (Math.abs(vm.moveX) <= 1) {
         return false;
       }
@@ -192,11 +196,20 @@ export default {
           vm.cout = 0;
         } else {
           if (INDEX - PAGENUM <= 0) {
-            INDEX = 0;
-            vm.cout = 0;
+            INDEX = PAGENUM;
+            if (vm.userTopicInfo.readIndex <= 0) {
+              vm.cout = 0;
+            } else {
+              vm.cout = PAGENUM - 1;
+            }
           } else {
             INDEX -= PAGENUM;
             vm.cout = PAGENUM - 1;
+          }
+          if (vm.userTopicInfo.readIndex <= 0) {
+            vm.userTopicInfo.readIndex = 0;
+          } else {
+            vm.userTopicInfo.readIndex--;
           }
         }
         this.setPageData(INDEX, data => {
@@ -205,6 +218,9 @@ export default {
         //刚开始第一次向左滑动时
         vm.movebox.style.webkitTransform =
           "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
+        vm.movebox.style.transition = "all .2s";
+
+        vm.setCollection();
         return false;
       }
       if (vm.cout == vm.itemLength - 1 && vm.moveX < 0) {
@@ -221,6 +237,8 @@ export default {
         //滑动到最后继续向右滑动时
         vm.movebox.style.webkitTransform =
           "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
+        vm.movebox.style.transition = "all .2s";
+
         return false;
       }
       //手指向左滑动
@@ -229,8 +247,10 @@ export default {
         if (vm.cout < vm.itemLength - 1) {
           vm.movebox.style.webkitTransform =
             "translateX(" + (vm.endX - vm.nodeWidth) + "px)";
+          vm.movebox.style.transition = "all 1s";
           vm.cout++;
           INDEX++;
+          vm.userTopicInfo.readIndex++;
         }
         //手指向右滑动
       } else {
@@ -241,12 +261,20 @@ export default {
         }
         if (vm.cout == 0) {
           vm.movebox.style.webkitTransform = "translateX(0px)";
+
           return false;
         } else {
           vm.movebox.style.webkitTransform =
             "translateX(" + (vm.endX + vm.nodeWidth) + "px)";
+
+          vm.movebox.style.transition = "all 1s";
           vm.cout--;
           INDEX--;
+          if (vm.userTopicInfo.readIndex <= 0) {
+            vm.userTopicInfo.readIndex = 0;
+          } else {
+            vm.userTopicInfo.readIndex--;
+          }
         }
       }
       vm.setCollection();
@@ -269,11 +297,17 @@ export default {
       list.forEach((element, index) => {
         if (element.id === readId + "") {
           lock = false;
+          console.log(index);
           vm.userTopicInfo.readIndex = index;
           INDEX = index;
-          vm.setPageData(index, data => {
-            callback(data);
-          });
+          vm.cout = INDEX % PAGENUM < 0 ? 0 : INDEX % PAGENUM;
+
+          vm.setPageData(
+            INDEX < PAGENUM ? 0 : INDEX - (INDEX % PAGENUM) - 1,
+            data => {
+              callback(data);
+            }
+          );
         }
       });
       if (lock) {
@@ -297,6 +331,7 @@ export default {
         pagingArr.push(vm.topicCacheData[_index]);
         _index++;
       }
+      console.log(pagingArr);
       callback(pagingArr);
     },
     // 保存阅读位置
@@ -325,7 +360,10 @@ export default {
         }
       });
       removeStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`);
-      setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      setStore(
+        `${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`,
+        vm.topicCacheData
+      );
 
       api
         .getDrivingRead(
@@ -347,6 +385,8 @@ export default {
       let vm = this;
       vm.setCurrentData(vm.topicCacheData, index, data => {
         vm.pageDataList = data;
+        vm.movebox.style.webkitTransform =
+          "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
       });
       vm.setCollection();
 
@@ -360,8 +400,13 @@ export default {
     setCollection() {
       let vm = this;
       vm.$refs.questionFooter.getCollection(
-        vm.topicCacheData[INDEX].is_collection,
-        vm.topicCacheData[INDEX].id
+        vm.topicCacheData[vm.userTopicInfo.readIndex].is_collection,
+        vm.topicCacheData[vm.userTopicInfo.readIndex].id
+      );
+      vm.$refs.questionFooter.setFootData(
+        vm.userTopicInfo.total,
+        vm.topicCacheData,
+        vm.userTopicInfo.readIndex
       );
     },
     // 修改收藏状态
@@ -375,7 +420,10 @@ export default {
         }
       });
       removeStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`);
-      setStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`, vm.topicCacheData);
+      setStore(
+        `${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`,
+        vm.topicCacheData
+      );
       api
         .setCollection(
           vm.userInfo.user_id,
@@ -409,7 +457,7 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 100%;
-    transition: all 1s;
+    // transition: all 1s;
     .question-item {
       width: 100%;
       min-width: 320px;

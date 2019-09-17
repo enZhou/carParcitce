@@ -36,7 +36,7 @@
 </template>
 <script>
 import $ from "jquery";
-const timeOutVal = 60; // 考试时间 分
+const timeOutVal = 45; // 考试时间 分
 export default {
   data() {
     return {

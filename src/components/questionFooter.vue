@@ -56,7 +56,7 @@
           <div
             v-else
             class="item"
-            :class="item.isAnswer===true?'yes':item.isAnswer===false?'no':''"
+            :class="item.isAnswer===true&& clickId === item.id?'yes green':item.isAnswer===true&& clickId !== item.id?'yes':item.isAnswer===false&& clickId === item.id?'no green':item.isAnswer===false&& clickId !== item.id?'no':item.isAnswer!==false&& clickId === item.id?'green':''"
           >{{index+1}}</div>
         </li>
       </ul>
@@ -129,12 +129,14 @@ export default {
     // 设置数据
     setFootData(total, list, readIndex) {
       const vm = this;
+      console.log(readIndex);
       vm.total = total;
       vm.footDataList = list;
       vm.readIndex = readIndex + 1;
     },
     // 是否收藏
     getCollection(val, id) {
+      console.log(id);
       let vm = this;
       vm.collection = val;
       vm.clickId = id;
@@ -160,10 +162,10 @@ export default {
   watch: {
     total(val, old) {
       console.log(val);
-    },
-    readIndex(val, old) {
-      console.log(val);
     }
+    // readIndex(val, old) {
+    //   console.log(val);
+    // }
   }
 };
 </script>

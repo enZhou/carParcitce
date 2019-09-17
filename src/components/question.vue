@@ -4,15 +4,21 @@
     <div class="question_title">
       <span class="_titleType" v-if="currentData.item3!=''">单选</span>
       <span class="_titleType" v-if="!currentData.item3||currentData.item3==''">判断</span>
-      <span class="_titleType" v-if="false">多选</span>
-      <span :class="isMotifType=='night'?'night':''">{{currentData.question}}</span>
+      <span class="_titleType" v-if="currentData.answer.length>2">多选</span>
+      <span>{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
     <video
       v-if="currentData.url&&!judgeSwfFiles(currentData.url)"
+      autoplay="autoplay"
       :src="currentData.url"
       controls="controls"
       style="width:100%"
+      height="200px"
+      webkit-playsinline
+      playsinline
+      x5-playsinline
+      x-webkit-airplay="allow"
     >您的浏览器不支持 video 标签。</video>
 
     <ul class="option_box" ref="option_box">
@@ -26,9 +32,9 @@
           v-else-if="currentData.answer !== 1 && answer ==1 && showErr"
         ></span>
         <div class="option" v-else>
-          <span :class="isMotifType=='night'?'night':''">A</span>
+          <span>A</span>
         </div>
-        <span :class="isMotifType=='night'?'night':''">{{currentData.item1}}</span>
+        <span>{{currentData.item1}}</span>
       </li>
       <li v-if="currentData.item2" @click="chooseOption(2)">
         <span
@@ -39,8 +45,8 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 2 && answer ==2 && showErr"
         ></span>
-        <div class="option" v-else :class="isMotifType=='night'?'night':''">B</div>
-        <span :class="isMotifType=='night'?'night':''">{{currentData.item2}}</span>
+        <div class="option" v-else>B</div>
+        <span>{{currentData.item2}}</span>
       </li>
       <li v-if="currentData.item3" @click="chooseOption(3)">
         <span
@@ -51,8 +57,8 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 3 && answer ==3 && showErr"
         ></span>
-        <div class="option" :class="isMotifType=='night'?'night':''" v-else>C</div>
-        <span :class="isMotifType=='night'?'night':''">{{currentData.item3}}</span>
+        <div class="option" v-else>C</div>
+        <span>{{currentData.item3}}</span>
       </li>
       <li v-if="currentData.item4" @click="chooseOption(4)">
         <span
@@ -63,25 +69,17 @@
           class="activeErr iconfont icon-cuowuguanbi-"
           v-else-if="currentData.answer !== 4 && answer ==4 && showErr"
         ></span>
-        <div class="option" :class="isMotifType=='night'?'night':''" v-else>D</div>
-        <span :class="isMotifType=='night'?'night':''">{{currentData.item4}}</span>
+        <div class="option" v-else>D</div>
+        <span>{{currentData.item4}}</span>
       </li>
     </ul>
     <div v-if="showErrExplain">
       <div class="questionInfo" v-if="isInfo">
         <div class="info_title">
-          <span :class="isMotifType=='night'?'night':''" class="title">试题详解</span>
+          <span class="title">试题详解</span>
         </div>
-        <div
-          class="info_content"
-          :class="isMotifType=='night'?'night':''"
-          v-html="currentData.explains"
-        ></div>
-        <div
-          class="info_content"
-          :class="isMotifType=='night'?'night':''"
-          v-html="currentData.explains"
-        ></div>
+        <div class="info_content" v-html="currentData.explains"></div>
+        <div class="info_content" v-html="currentData.explains"></div>
       </div>
     </div>
   </div>
@@ -98,8 +96,7 @@ export default {
       showErr: false, // 是否显示错误答案
       userInfo: null,
       showErrExplain: this.isShowErrExplain,
-      currentData: Object.assign({}, this.topicInfo), // 题目信息
-      isMotifType: this.motifType
+      currentData: Object.assign({}, this.topicInfo) // 题目信息
     };
   },
   props: {
@@ -111,10 +108,6 @@ export default {
     isShowErrExplain: {
       type: Boolean,
       default: false
-    },
-    motifType: {
-      type: String,
-      default: "criteria"
     },
     topicInfo: {
       type: Object,
@@ -184,10 +177,6 @@ export default {
     isShowErrExplain(val, old) {
       let vm = this;
       vm.showErrExplain = val;
-    },
-    motifType(val, old) {
-      let vm = this;
-      vm.isMotifType = val;
     },
     info(val, oldVal) {
       const vm = this;
@@ -287,9 +276,5 @@ export default {
       margin: 0 auto;
     }
   }
-}
-
-.night {
-  color: #fff !important;
 }
 </style>

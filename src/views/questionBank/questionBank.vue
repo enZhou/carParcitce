@@ -45,10 +45,7 @@
           <!-- 顺序练习 -->
           <div class="practice_box">
             <!-- 我的错题 -->
-            <router-link
-              class="errorTipic"
-              :to="'/errorQuestion/?type='+getDataType"
-            >
+            <router-link class="errorTipic" :to="'/errorQuestion/?type='+getDataType">
               <div class="error_img">
                 <img src="../../assets/img/myError.png" alt srcset />
               </div>
@@ -107,10 +104,7 @@
           <!-- 模拟考试 -->
           <div class="exam_box">
             <!-- 我的收藏 -->
-            <router-link
-              class="errorTipic"
-              :to="'/questionCollect?type='+getDataType"
-            >
+            <router-link class="errorTipic" :to="'/questionCollect?type='+getDataType">
               <div class="error_img">
                 <img src="../../assets/img/myCollect.png" alt srcset />
               </div>
@@ -145,15 +139,12 @@
                 <li></li>
               </ul>
 
-              <router-link
-                class="exam_round"
-                :to="'/mockExam/?type='+getDataType+'&score='+dlData.score"
-              >
+              <div class="exam_round" @click="gotoMockExam">
                 <div class="tipic_round_purple">
                   <p>模拟考试</p>
                   <p>{{dlData.score || 0}}</p>
                 </div>
-              </router-link>
+              </div>
             </div>
             <!-- 专项练习 -->
             <div class="topicsPecial_box">
@@ -167,7 +158,14 @@
       </div>
       <!-- <div class="cnt_body_four" v-if="bankType==1">科目四</div> -->
     </div>
-
+    <questionDialog
+      :is-show="isShowDialog"
+      :title="dialogTitle"
+      :content="dialogContent"
+      :showClose="false"
+      @okClk="okDialog"
+      ref="dialog"
+    />
     <stuFooter></stuFooter>
   </div>
 </template>
@@ -175,8 +173,10 @@
 import stuFooter from "../../components/stuFooter";
 import api from "../../api/common.js";
 import { getStore } from "../../common/util.js";
+import questionDialog from "../../components/questionDialog.vue";
+
 export default {
-  components: { stuFooter },
+  components: { stuFooter, questionDialog },
   data() {
     return {
       title: "驾考题库",
@@ -191,7 +191,10 @@ export default {
         score: null
       }, // 驾驶证数据
       userInfo: null, // 用户信息
-      getDataType: null // 请求类型type
+      getDataType: null, // 请求类型type
+      isShowDialog: false, // 是否显示弹窗
+      dialogTitle: "考试规则", //弹窗标题
+      dialogContent: "" //弹窗内容
     };
   },
   async created() {
@@ -271,6 +274,24 @@ export default {
       } else if (bankType == 1) {
         vm.dlData = vm.practiceData.subject_four;
       }
+    },
+    // 去模拟考试
+    gotoMockExam() {
+      let vm = this;
+      if (vm.getDataType == 1) {
+        vm.dialogContent = `小车- C1/C2/C3 科目一，考试时间45分钟，共100道题，模拟考试下不能修改答案，每做错一题扣1分，合格标准为90分`;
+      }else if (vm.getDataType == 4){
+        vm.dialogContent = `小车- C1/C2/C3 科目四，考试时间45分钟，共50道题，模拟考试下不能修改答案，每做错一题扣2分，合格标准为90分`;
+      }
+      vm.isShowDialog = true;
+    },
+    // 弹窗确认
+    okDialog() {
+      let vm = this;
+      vm.$router.push(`/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`);
+      // console.log(
+      //   `/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`
+      // );
     }
   }
 };
