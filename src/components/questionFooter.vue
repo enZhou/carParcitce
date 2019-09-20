@@ -129,14 +129,12 @@ export default {
     // 设置数据
     setFootData(total, list, readIndex) {
       const vm = this;
-      console.log(readIndex);
       vm.total = total;
       vm.footDataList = list;
       vm.readIndex = readIndex + 1;
     },
     // 是否收藏
     getCollection(val, id) {
-      console.log(id);
       let vm = this;
       vm.collection = val;
       vm.clickId = id;
