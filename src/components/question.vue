@@ -7,7 +7,7 @@
       <span class="_titleType" v-if="currentData.answer.length>=2">多选</span>
       <span class="_titleType" v-else-if="currentData.item3!=''">单选</span>
       <span class="_titleType" v-else-if="!currentData.item3||currentData.item3==''">判断</span>
-      <span>{{currentData.question}}</span>
+      <span>{{currentData.id}}{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&!judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
     <video
@@ -22,11 +22,11 @@
       x5-playsinline
       x-webkit-airplay="allow"
     >您的浏览器不支持 video 标签。</video>
-    <ul class="option_box" ref="option_box">
+    <!-- <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption($event,1)">
         <span
           class="activeCorrect iconfont icon-duigoutianchong-"
-          v-if="currentData.changeAnswer.indexOf('1')!==-1 && answer.indexOf('1')!=-1&& answerType"
+          v-if="currentData.changeAnswer.indexOf('1')!==-1&& answerType"
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
@@ -38,7 +38,7 @@
       <li v-if="currentData.item2" @click="chooseOption($event,2)">
         <span
           class="activeCorrect iconfont icon-duigoutianchong-"
-          v-if="currentData.changeAnswer.indexOf('2')!==-1 && answer.indexOf('2')!=-1&& answerType"
+          v-if="currentData.changeAnswer.indexOf('2')!==-1&& answerType"
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
@@ -50,7 +50,7 @@
       <li v-if="currentData.item3" @click="chooseOption($event,3)">
         <span
           class="activeCorrect iconfont icon-duigoutianchong-"
-          v-if="currentData.changeAnswer.indexOf('3')!==-1 && answer.indexOf('3')!=-1&& answerType"
+          v-if="currentData.changeAnswer.indexOf('3')!==-1&& answerType"
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
@@ -62,7 +62,7 @@
       <li v-if="currentData.item4" @click="chooseOption($event,4)">
         <span
           class="activeCorrect iconfont icon-duigoutianchong-"
-          v-if="currentData.changeAnswer.indexOf('4')!==-1 && answer.indexOf('4')!=-1&& answerType"
+          v-if="currentData.changeAnswer.indexOf('4')!==-1&& answerType"
         ></span>
         <span
           class="activeErr iconfont icon-cuowuguanbi-"
@@ -71,7 +71,7 @@
         <div ref="option_li4" class="option" v-else>D</div>
         <span>{{currentData.item4}}</span>
       </li>
-    </ul>
+    </ul> -->
     <button
       class="checkAnswer"
       v-if="currentData.changeAnswer.length>=2"
@@ -82,7 +82,6 @@
         <div class="info_title">
           <span class="title">试题详解</span>
         </div>
-        <div class="info_content" v-html="currentData.explains"></div>
         <div class="info_content" v-html="currentData.explains"></div>
       </div>
     </div>
@@ -141,7 +140,7 @@ export default {
       showErr: false, // 是否显示错误答案
       userInfo: null,
       showErrExplain: this.isShowErrExplain,
-      currentData: {} // 题目信息
+      currentData: Object.assign({}, this.topicInfo) // 题目信息
     };
   },
   props: {
@@ -171,8 +170,6 @@ export default {
   },
   created() {
     let vm = this;
-    vm.currentData = Object.assign({}, this.topicInfo);
-    vm.currentData.changeAnswer = vm.changeAnswer[vm.currentData.answer];
   },
   mounted() {
     const vm = this;
@@ -194,8 +191,6 @@ export default {
     // 单选题
     radioClcik(answer) {
       let vm = this;
-      console.log(answer);
-      console.log(vm.currentData.answer)
       vm.answerType = true;
       vm.answer = answer;
       vm.isInfo = true;

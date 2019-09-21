@@ -64,6 +64,23 @@ export default {
 
   data() {
     return {
+      changeAnswer: {
+        1: "1",
+        2: "2",
+        3: "3",
+        4: "4",
+        7: "12",
+        8: "13",
+        9: "14",
+        10: "23",
+        11: "24",
+        12: "34",
+        13: "123",
+        14: "124",
+        15: "134",
+        16: "234",
+        17: "1234"
+      },
       active: "answer",
       showType: "tab",
 
@@ -123,6 +140,7 @@ export default {
                 vm.userTopicInfo.last_read_id,
                 data => {
                   vm.pageDataList = data;
+                  console.log(data);
                   vm.$nextTick(() => {
                     vm.initSlide();
                     vm.movebox.style.webkitTransform =
@@ -195,7 +213,7 @@ export default {
         if (INDEX <= 0) {
           vm.cout = 0;
         } else {
-          if (INDEX - PAGENUM <= 0) {
+          if (INDEX - PAGENUM < 0) {
             INDEX = PAGENUM;
             if (vm.userTopicInfo.readIndex <= 0) {
               vm.cout = 0;
@@ -229,6 +247,7 @@ export default {
         } else {
           INDEX = vm.topicCacheData.length - PAGENUM;
         }
+        console.log(INDEX);
         this.setPageData(INDEX, data => {
           this.pageDataList = data;
         });
@@ -249,16 +268,11 @@ export default {
             "translateX(" + (vm.endX - vm.nodeWidth) + "px)";
           vm.movebox.style.transition = "all 1s";
           vm.cout++;
-          INDEX++;
           vm.userTopicInfo.readIndex++;
         }
         //手指向右滑动
       } else {
         console.log("上一条");
-        if (INDEX <= 0) {
-          INDEX = 0;
-          vm.cout = 0;
-        }
         if (vm.cout == 0) {
           vm.movebox.style.webkitTransform = "translateX(0px)";
 
@@ -269,7 +283,12 @@ export default {
 
           vm.movebox.style.transition = "all 1s";
           vm.cout--;
-          INDEX--;
+
+          if (INDEX <= 0) {
+            INDEX = 0;
+          } else {
+            INDEX--;
+          }
           if (vm.userTopicInfo.readIndex <= 0) {
             vm.userTopicInfo.readIndex = 0;
           } else {
@@ -297,17 +316,13 @@ export default {
       list.forEach((element, index) => {
         if (element.id === readId + "") {
           lock = false;
-          console.log(index);
           vm.userTopicInfo.readIndex = index;
-          INDEX = index;
-          vm.cout = INDEX % PAGENUM < 0 ? 0 : INDEX % PAGENUM;
-
-          vm.setPageData(
-            INDEX < PAGENUM ? 0 : INDEX - (INDEX % PAGENUM) - 1,
-            data => {
-              callback(data);
-            }
-          );
+          INDEX = parseInt(index / PAGENUM) * PAGENUM;
+          console.log(index);
+          vm.cout = index % PAGENUM < 0 ? 0 : index % PAGENUM;
+          vm.setPageData(INDEX, data => {
+            callback(data);
+          });
         }
       });
       if (lock) {
@@ -328,10 +343,11 @@ export default {
       let pagingArr = new Array();
       let forIndex = null;
       for (let i = 0; i < PAGENUM; i++) {
+        vm.topicCacheData[_index].changeAnswer =
+          vm.changeAnswer[vm.topicCacheData[_index].answer];
         pagingArr.push(vm.topicCacheData[_index]);
         _index++;
       }
-      console.log(pagingArr);
       callback(pagingArr);
     },
     // 保存阅读位置

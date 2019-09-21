@@ -139,7 +139,6 @@ export default {
     changeType(val) {
       let self = this;
       self.active = val;
-      console.log(1)
       if (self.active === "recite") {
         self.isShowErrExplain = true;
       } else {
