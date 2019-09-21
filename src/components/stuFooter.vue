@@ -35,7 +35,6 @@ export default {
   created() {
     this.stuTabs.forEach((el, index) => {
       if (el.path == this.$route.path) {
-        console.log(this.$route.path);
         if (
           (this.$route.path == "/ownCenter" || this.$route.path == "/questionBank") &&
           !localStorage.getItem("stuMobile")

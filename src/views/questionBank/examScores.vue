@@ -29,7 +29,7 @@
             <span>考试用时</span>
           </li>
           <li>
-            <p>{{score<=OFFSCORE?'不合格':'及格'}}</p>
+            <p>{{score<OFFSCORE?'不合格':'及格'}}</p>
             <span>考试结果</span>
           </li>
           <li>
@@ -54,7 +54,7 @@ export default {
       maxScore: 0,
       time: null,
       showTime: "",
-      OFFSCORE: 80, // 及格线
+      OFFSCORE: 90, // 及格线
       showTitle: {},
       failList: [
         {

@@ -296,7 +296,6 @@ export default {
     // 答题
     yetTipicList(id, qa, sa) {
       let vm = this;
-      console.log('12313123')
       vm.isShowErrExplain = true; // 错误详解
       vm.topicArr.forEach((element, index) => {
         if (element.id === id + "") {

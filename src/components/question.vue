@@ -7,7 +7,7 @@
       <span class="_titleType" v-if="currentData.answer.length>=2">多选</span>
       <span class="_titleType" v-else-if="currentData.item3!=''">单选</span>
       <span class="_titleType" v-else-if="!currentData.item3||currentData.item3==''">判断</span>
-      <span>{{currentData.id}}{{currentData.question}}</span>
+      <span>{{currentData.question}}</span>
     </div>
     <img v-if="currentData.url&&!judgeSwfFiles(currentData.url)" :src="currentData.url || ''" alt />
     <video
@@ -22,7 +22,7 @@
       x5-playsinline
       x-webkit-airplay="allow"
     >您的浏览器不支持 video 标签。</video>
-    <!-- <ul class="option_box" ref="option_box">
+    <ul class="option_box" ref="option_box">
       <li v-if="currentData.item1" @click="chooseOption($event,1)">
         <span
           class="activeCorrect iconfont icon-duigoutianchong-"
@@ -71,7 +71,7 @@
         <div ref="option_li4" class="option" v-else>D</div>
         <span>{{currentData.item4}}</span>
       </li>
-    </ul> -->
+    </ul>
     <button
       class="checkAnswer"
       v-if="currentData.changeAnswer.length>=2"
@@ -152,6 +152,10 @@ export default {
     isShowErrExplain: {
       type: Boolean,
       default: false
+    },
+    oldAnswer: {
+      type: String,
+      default: ""
     },
     topicInfo: {
       type: Object,
@@ -242,7 +246,7 @@ export default {
     // 每次答题完成恢复默认
     resetType() {
       const vm = this;
-      vm.answer = null;
+      vm.answer = "";
       vm.isInfo = false;
       vm.showErr = false;
       vm.answerType = false;
@@ -282,7 +286,7 @@ export default {
           vm.showErr = false;
         } else {
           vm.answerType = false;
-          vm.chooseOption(vm.answer);
+          vm.radioClcik(vm.answer);
         }
       }
     }

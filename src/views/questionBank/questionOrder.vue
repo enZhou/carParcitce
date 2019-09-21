@@ -53,7 +53,7 @@ import api from "../../api/common.js"; // require styles
 import { setStore, getStore, removeStore } from "../../common/util.js";
 import $ from "jquery";
 var INDEX = 0;
-var PAGENUM = 20; // 每页条数
+var PAGENUM = 50; // 每页条数
 export default {
   components: {
     commonPage,
@@ -102,7 +102,8 @@ export default {
         readIndex: null, // 当前阅读位置
         collection: null // 是否收藏
       },
-      saveShowErrExplain: false
+      saveShowErrExplain: false,
+      oldAnswer: "" //老答案
     };
   },
   async created() {
@@ -140,7 +141,6 @@ export default {
                 vm.userTopicInfo.last_read_id,
                 data => {
                   vm.pageDataList = data;
-                  console.log(data);
                   vm.$nextTick(() => {
                     vm.initSlide();
                     vm.movebox.style.webkitTransform =
@@ -237,7 +237,6 @@ export default {
         vm.movebox.style.webkitTransform =
           "translateX(" + vm.cout * -vm.nodeWidth + "px)"; //手指滑动时滑动对象随之滑动
         vm.movebox.style.transition = "all .2s";
-
         vm.setCollection();
         return false;
       }
@@ -247,7 +246,6 @@ export default {
         } else {
           INDEX = vm.topicCacheData.length - PAGENUM;
         }
-        console.log(INDEX);
         this.setPageData(INDEX, data => {
           this.pageDataList = data;
         });
@@ -318,7 +316,6 @@ export default {
           lock = false;
           vm.userTopicInfo.readIndex = index;
           INDEX = parseInt(index / PAGENUM) * PAGENUM;
-          console.log(index);
           vm.cout = index % PAGENUM < 0 ? 0 : index % PAGENUM;
           vm.setPageData(INDEX, data => {
             callback(data);
@@ -344,7 +341,7 @@ export default {
       let forIndex = null;
       for (let i = 0; i < PAGENUM; i++) {
         vm.topicCacheData[_index].changeAnswer =
-          vm.changeAnswer[vm.topicCacheData[_index].answer];
+          vm.changeAnswer[vm.topicCacheData[_index].answer] + "";
         pagingArr.push(vm.topicCacheData[_index]);
         _index++;
       }
@@ -364,13 +361,12 @@ export default {
       vm.topicCacheData.forEach((element, index) => {
         if (element.id === questionId + "") {
           vm.userTopicInfo.readIndex = index;
+            vm.saveShowErrExplain = true;
           vm.userTopicInfo.is_collection = element.is_collection;
           element.isRead = true;
           if (element.answer === answer + "") {
             isAnswer = true;
-            vm.saveShowErrExplain = true;
           } else {
-            vm.saveShowErrExplain = false;
             vm.setDrivingWrong(questionId);
           }
         }
