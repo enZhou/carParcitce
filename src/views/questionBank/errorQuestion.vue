@@ -64,6 +64,23 @@ export default {
       showType: "tab",
       userInfo: null, // 用户信息
       topicArr: new Array(), // 题目信息
+      changeAnswer: {
+        1: "1",
+        2: "2",
+        3: "3",
+        4: "4",
+        7: "12",
+        8: "13",
+        9: "14",
+        10: "23",
+        11: "24",
+        12: "34",
+        13: "123",
+        14: "124",
+        15: "134",
+        16: "234",
+        17: "1234"
+      },
       movebox: null, // 可滑动容器
       slideItem: null, // 滑动块
       moveX: null, // 手指滑动的距离
@@ -107,6 +124,9 @@ export default {
             vm.changeData(res.list, list => {
               PAGENUM = list.length;
               vm.topicArr = list;
+              vm.topicArr.forEach(item => {
+                item.changeAnswer = vm.changeAnswer[item.answer] + "";
+              });
               vm.$nextTick(() => {
                 vm.initSlide();
                 vm.nextOne();

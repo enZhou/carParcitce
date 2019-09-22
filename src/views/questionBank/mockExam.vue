@@ -81,7 +81,24 @@ export default {
       itemLength: 0, // item个数
       readIndex: 0,
       answerList: [], // 已回答目录
-      maxScore: 0 // 最佳成绩
+      maxScore: 0, // 最佳成绩
+      changeAnswer: {
+        1: "1",
+        2: "2",
+        3: "3",
+        4: "4",
+        7: "12",
+        8: "13",
+        9: "14",
+        10: "23",
+        11: "24",
+        12: "34",
+        13: "123",
+        14: "124",
+        15: "134",
+        16: "234",
+        17: "1234"
+      }
     };
   },
   async created() {
@@ -98,6 +115,9 @@ export default {
         .getDrivingTest(vm.userInfo.user_id, vm.$route.query.type)
         .then(res => {
           vm.topicArr = res.list;
+          vm.topicArr.forEach((item, index) => {
+            item.changeAnswer = vm.changeAnswer[item.answer] + "";
+          });
           vm.$nextTick(() => {
             vm.initSlide();
             vm.nextOne();

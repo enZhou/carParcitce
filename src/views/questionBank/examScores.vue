@@ -16,7 +16,8 @@
         <p class="m-30">
           <span class="score">
             {{
-            score}}
+            score
+            }}
           </span>
           <span class="bold_font">分</span>
         </p>
@@ -24,12 +25,18 @@
           <li>
             <p>
               {{
-              showTime}}
+              showTime
+              }}
             </p>
             <span>考试用时</span>
           </li>
           <li>
-            <p>{{score<OFFSCORE?'不合格':'及格'}}</p>
+            <p v-if="score<OFFSCORE">
+              不合格
+            </p>
+            <p v-else>
+              及格
+            </p>
             <span>考试结果</span>
           </li>
           <li>
@@ -97,9 +104,9 @@ export default {
     vm.showTime =
       (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
   },
-  methods:{
-    goback(){
-      this.$router.replace('questionBank')
+  methods: {
+    goback() {
+      this.$router.replace("questionBank");
     }
   }
 };

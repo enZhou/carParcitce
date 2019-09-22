@@ -361,7 +361,7 @@ export default {
       vm.topicCacheData.forEach((element, index) => {
         if (element.id === questionId + "") {
           vm.userTopicInfo.readIndex = index;
-            vm.saveShowErrExplain = true;
+          vm.saveShowErrExplain = true;
           vm.userTopicInfo.is_collection = element.is_collection;
           element.isRead = true;
           if (element.answer === answer + "") {
@@ -426,11 +426,9 @@ export default {
       let vm = this;
       let isCollection = type === 0 ? false : true;
       let questionId = vm.topicCacheData[INDEX].id;
-      vm.topicCacheData.forEach((element, index) => {
-        if (element.id === questionId + "") {
-          element.is_collection = isCollection;
-        }
-      });
+      vm.topicCacheData[
+        vm.userTopicInfo.readIndex
+      ].is_collection = isCollection;
       removeStore(`${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`);
       setStore(
         `${vm.userInfo.user_id}vehicleList${vm.$route.query.type}`,
@@ -440,7 +438,7 @@ export default {
         .setCollection(
           vm.userInfo.user_id,
           vm.$route.query.type,
-          questionId,
+          vm.userTopicInfo.readIndex,
           type
         )
         .then(res => {
