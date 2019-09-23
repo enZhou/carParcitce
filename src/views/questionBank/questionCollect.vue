@@ -88,7 +88,7 @@ export default {
         total: null, // 题目总数
         readIndex: null, // 当前阅读位置
         collection: null // 是否收藏
-      },
+      }
     };
   },
   async created() {
@@ -106,6 +106,7 @@ export default {
           .then(res => {
             console.log(res);
             if (res.list.length <= 0) {
+              vm.$toast("暂无数据～", true);
               vm.$router.replace("/questionBank");
               return false;
             }
@@ -127,7 +128,7 @@ export default {
       let newList = [];
       list.forEach(item => {
         newList.push({
-          answer: item.question_info.answer +'',
+          answer: item.question_info.answer + "",
           explains: item.question_info.explains,
           id: item.question_info.id,
           is_collection: true,

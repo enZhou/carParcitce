@@ -118,6 +118,7 @@ export default {
           .getDrivingWrongList(vm.userInfo.user_id, vm.$route.query.type)
           .then(res => {
             if (res.list.length <= 0) {
+              vm.$toast("暂无数据～", true);
               vm.$router.replace("/questionBank");
               return false;
             }
