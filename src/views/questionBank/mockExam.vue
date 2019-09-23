@@ -130,7 +130,6 @@ export default {
     // 交卷弹窗事件
     submitClk: function() {
       let self = this;
-      console.log(self.$route.query.type);
       // 你本次做对14道题，做错11道题 考试得分14分，考试不合格，确认
       self.isShow = true;
       self.dialogTitle = `成绩${SCORE > OFFSCORE ? "及格" : "不及格"}`;
@@ -159,7 +158,12 @@ export default {
         .then(res => {
           vm.$router.push({
             name: "examScores",
-            query: { time: time, score: SCORE, maxCore: vm.maxScore }
+            query: {
+              time: time,
+              score: SCORE,
+              maxCore: vm.maxScore,
+              type: vm.$route.query.type
+            }
           }); // 路径名name
         });
     },

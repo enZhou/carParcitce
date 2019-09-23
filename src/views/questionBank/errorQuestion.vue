@@ -311,7 +311,7 @@ export default {
         vm.topicArr,
         INDEX
       );
-      vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
+      vm.$refs.questionFooter.getCollection(vm.topicArr[INDEX].is_collection === undefined?false:true, vm.topicArr[INDEX].id);
     },
     // 答题
     yetTipicList(id, qa, sa) {

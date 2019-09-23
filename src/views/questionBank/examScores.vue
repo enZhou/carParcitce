@@ -31,12 +31,8 @@
             <span>考试用时</span>
           </li>
           <li>
-            <p v-if="score<OFFSCORE">
-              不合格
-            </p>
-            <p v-else>
-              及格
-            </p>
+            <p v-if="score<OFFSCORE">不合格</p>
+            <p v-else>及格</p>
             <span>考试结果</span>
           </li>
           <li>
@@ -49,6 +45,7 @@
             <span>最佳成绩</span>
           </li>
         </ul>
+        <button class="lockError" @click="lockErr">查看错题</button>
       </div>
     </div>
   </div>
@@ -85,6 +82,21 @@ export default {
       ]
     };
   },
+  created() {
+    let vm = this;
+    let title = "";
+    if (vm.$route.query.type == "1") {
+      title = "科目一";
+    } else if (vm.$route.query.type == "4") {
+      title = "科目四";
+    } else {
+      title = "";
+    }
+    if (this.$route.name === "examScores") {
+      title += "考试成绩";
+    }
+    document.title = title;
+  },
   mounted() {
     let vm = this;
     if (Object.keys(vm.$route.query).length > 0) {
@@ -107,6 +119,12 @@ export default {
   methods: {
     goback() {
       this.$router.replace("questionBank");
+    },
+    lockErr() {
+      let vm = this;
+      vm.$router.replace(
+        `errorQuestion/?type=${vm.$route.query.type}`
+      );
     }
   }
 };
@@ -205,6 +223,14 @@ export default {
             font-weight: 600;
           }
         }
+      }
+      .lockError {
+        margin-top: 0.5rem;
+        border-radius: 0.1rem;
+        padding: 0.1rem 0.3rem;
+        color: #fff;
+        background-color: rgba(251, 110, 82, 1);
+        cursor: pointer;
       }
     }
   }

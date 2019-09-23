@@ -5,7 +5,12 @@
       <span slot="txt" class="title">专项练习</span>
     </commonPage>
     <div class="_cnt">
-      <div class="_cnt-item" v-for="(value,key,index) in practiceList" :key="index+1">
+      <div
+        class="_cnt-item"
+        @click="lockSpecial"
+        v-for="(value,key,index) in practiceList"
+        :key="index+1"
+      >
         <div class="_cnt-item-left">
           <div class="index-box">
             <div class="box-cnt">
@@ -105,15 +110,20 @@ export default {
       roadNum: 130, // 路况题
       instrumentNum: 65 // 仪表题
     };
+  },
+  methods: {
+    lockSpecial() {
+      this.$toast('敬请期待', true);
+    }
   }
 };
 </script>
 <style scoped lang="scss">
 .specialPractice {
-    .title{
-        font-size: .38rem;
-        font-weight: bold;
-    }
+  .title {
+    font-size: 0.38rem;
+    font-weight: bold;
+  }
   ._cnt {
     display: flex;
     flex-direction: row;

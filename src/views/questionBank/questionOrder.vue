@@ -48,7 +48,6 @@
 import commonPage from "../../components/commonPage.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import Question from "../../components/question.vue";
-import test from "../../components/test.vue";
 import api from "../../api/common.js"; // require styles
 import { setStore, getStore, removeStore } from "../../common/util.js";
 import $ from "jquery";
@@ -59,7 +58,6 @@ export default {
     commonPage,
     questionFooter,
     Question,
-    test
   },
 
   data() {

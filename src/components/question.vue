@@ -174,6 +174,9 @@ export default {
   },
   created() {
     let vm = this;
+    if(vm.$route.name === 'errorQuestion' || vm.$route.name === 'questionCollect'){
+      vm.radioClcik(vm.currentData.answer)
+    }
   },
   mounted() {
     const vm = this;

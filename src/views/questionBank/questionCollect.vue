@@ -1,13 +1,7 @@
 <!-- 模拟考试 -->
 <template>
   <div>
-    <commonPage
-      ref="commonPage"
-      :active="active"
-      :showType="showType"
-      @changeModal="changeType"
-      @showErrExplain="showErrExplain"
-    ></commonPage>
+    <commonPage ref="commonPage" :active="active" :showType="showType"></commonPage>
     <div class="question-content">
       <ul
         class="question-ul"
@@ -17,16 +11,9 @@
       >
         <li class="question-item" v-for="(item,index) in topicArr" :key="index">
           <question
-            v-if="active === 'answer'"
-            :topicInfo="item"
-            :info="false"
-            :isShowErrExplain="isShowErrExplain"
-            ref="question"
-          ></question>
-          <question
             v-if="active === 'recite'"
             :topicInfo="item"
-            :isShowErrExplain="isShowErrExplain"
+            :isShowErrExplain="true"
             :info="true"
             ref="question"
           ></question>
@@ -62,10 +49,10 @@ export default {
   },
   data() {
     return {
-      active: "answer",
+      active: "recite",
       showType: "tab",
       userInfo: null, // 用户信息
-      topicArr: new Array(), // 题目信息
+      topicArr: [], // 题目信息
       changeAnswer: {
         1: "1",
         2: "2",
@@ -96,14 +83,12 @@ export default {
       readIndex: 0,
       answerList: [], // 已回答目录
       maxScore: 0, // 最佳成绩
-      isShowErrExplain: false, // 错误详解
       userTopicInfo: {
         last_read_id: null, // 历史阅读位置题目id
         total: null, // 题目总数
         readIndex: null, // 当前阅读位置
         collection: null // 是否收藏
       },
-      saveShowErrExplain: false
     };
   },
   async created() {
@@ -119,16 +104,15 @@ export default {
         api
           .getCollectionList(vm.userInfo.user_id, vm.$route.query.type)
           .then(res => {
+            console.log(res);
             if (res.list.length <= 0) {
               vm.$router.replace("/questionBank");
               return false;
             }
+            PAGENUM = res.list.length;
+            vm.topicArr = [];
             vm.changeData(res.list, list => {
-              PAGENUM = list.length;
-              vm.topicArr = list;
-              vm.topicArr.forEach(item => {
-                item.changeAnswer = vm.changeAnswer[item.answer] + "";
-              });
+              vm.topicArr = Object.assign([], list);
               vm.$nextTick(() => {
                 vm.initSlide();
                 vm.nextOne();
@@ -143,7 +127,7 @@ export default {
       let newList = [];
       list.forEach(item => {
         newList.push({
-          answer: item.question_info.answer,
+          answer: item.question_info.answer +'',
           explains: item.question_info.explains,
           id: item.question_info.id,
           is_collection: true,
@@ -152,20 +136,11 @@ export default {
           item3: item.question_info.item3,
           item4: item.question_info.item4,
           question: item.question_info.question,
-          url: item.question_info.url
+          url: item.question_info.url,
+          changeAnswer: this.changeAnswer[item.question_info.answer] + ""
         });
       });
       callback && callback(newList);
-    },
-    //选择模式
-    changeType(val) {
-      let vm = this;
-      vm.active = val;
-      if (vm.active === "recite") {
-        vm.isShowErrExplain = true;
-      } else {
-        vm.isShowErrExplain = vm.saveShowErrExplain;
-      }
     },
     // 修改收藏状态
     httpCollection(type) {
@@ -303,7 +278,10 @@ export default {
         vm.topicArr,
         INDEX
       );
-      vm.$refs.questionFooter.getCollection(null, vm.topicArr[INDEX].id);
+      vm.$refs.questionFooter.getCollection(
+        vm.topicArr[INDEX].is_collection === undefined ? false : true,
+        vm.topicArr[INDEX].id
+      );
     },
     // 答题
     yetTipicList(id, qa, sa) {
@@ -326,12 +304,6 @@ export default {
         question_answer: qa,
         submit_answer: sa
       });
-    },
-    // 关闭试题详解
-    showErrExplain(val) {
-      let vm = this;
-      vm.isShowErrExplain = val;
-      vm.saveShowErrExplain = val;
     }
   }
 };
@@ -348,6 +320,7 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 100%;
+    transition: all 1s;
     .question-item {
       min-width: 320px;
     }

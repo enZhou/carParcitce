@@ -3,16 +3,23 @@
   <div class="content" v-if="showContent">
     <!-- tab -->
     <div class="tab-header">
-      <span class="iconfont return" @click="goBack">&#xe62a;</span>
+      <div>
+        <span class="iconfont return" @click="goBack">&#xe62a;</span>
+      </div>
       <div class="tabs" v-if="showType === 'tab'">
         <div
           class="tab"
-          :class="{ active: item.type === active }"
-          v-for="(item, index) in navList"
-          :key="index"
-          @click="changemodal(item.type)"
-        >{{ item.name }}</div>
+          v-if="showAnswer"
+          :class="{ active: 'answer' === active }"
+          @click="changemodal('answer')"
+        >答题模式</div>
+        <div
+          class="tab"
+          :class="{ active: 'recite' === active }"
+          @click="changemodal('recite')"
+        >背题模式</div>
       </div>
+
       <!-- 倒计时 -->
       <div class="time" v-if="showType === 'time'">
         <!-- 开始 -->
@@ -41,6 +48,7 @@ export default {
   data() {
     return {
       countdownType: true, // 倒计时状态
+      showAnswer: true,
       navList: [
         {
           name: "答题模式",
@@ -74,6 +82,10 @@ export default {
       default: true
     }
   },
+  created() {
+    let vm = this;
+    document.title = vm.changeTitle(this.$route.path, this.$route.query.type);
+  },
   mounted() {
     let vm = this;
     if (vm.showType === "time") {
@@ -84,9 +96,50 @@ export default {
     this.Countdown();
   },
   methods: {
+    changeTitle(url, type) {
+      let vm = this;
+      let title = "";
+      if (type === "1") {
+        title = "科目一";
+      } else if (type === "4") {
+        title = "科目四";
+      } else {
+        title = "";
+      }
+      switch (url) {
+        case "/errorQuestion/":
+          title += "->我的错题";
+          vm.showAnswer = false;
+          vm.changemodal("recite");
+          break;
+        case "/mockExam/":
+          title += "->模拟考试";
+          break;
+        case "/questionCollect/":
+          title += "->我的收藏";
+          vm.showAnswer = false;
+          vm.changemodal("recite");
+          break;
+        case "/questionOrder/":
+          title += "->顺序练习";
+          break;
+        case "/specialPractice/":
+          title += "-专项练习";
+          break;
+        case "/examScores/":
+          title += "-考试成绩";
+          break;
+        default:
+          title += "教练通";
+          vm.showAnswer = true;
+      }
+      return title;
+    },
     goBack() {
       let vm = this;
-      window.history.go(-1);
+      vm.$router.replace(
+        `/questionBank/`
+      );
     },
     changemodal(type) {
       let self = this;
@@ -111,7 +164,7 @@ export default {
     getTime() {
       let vm = this;
       return timeOutVal * 60 - vm.sumTimeOut;
-    },
+    }
   }
 };
 </script>

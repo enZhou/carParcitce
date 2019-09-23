@@ -104,7 +104,7 @@
           <!-- 模拟考试 -->
           <div class="exam_box">
             <!-- 我的收藏 -->
-            <router-link class="errorTipic" :to="'/questionCollect?type='+getDataType">
+            <router-link class="errorTipic" :to="'/questionCollect/?type='+getDataType">
               <div class="error_img">
                 <img src="../../assets/img/myCollect.png" alt srcset />
               </div>
@@ -199,6 +199,7 @@ export default {
   },
   async created() {
     const vm = this;
+    document.title = '教练通'
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (vm.userInfo) {
       vm.getMainData(vm.userInfo.user_id);
@@ -289,9 +290,6 @@ export default {
     okDialog() {
       let vm = this;
       vm.$router.push(`/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`);
-      // console.log(
-      //   `/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`
-      // );
     }
   }
 };

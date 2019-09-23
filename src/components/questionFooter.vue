@@ -161,9 +161,6 @@ export default {
     total(val, old) {
       console.log(val);
     }
-    // readIndex(val, old) {
-    //   console.log(val);
-    // }
   }
 };
 </script>

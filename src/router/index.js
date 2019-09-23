@@ -89,43 +89,43 @@ const router = new Router({
         },
         // 驾考题库
         {
-            path: '/questionBank',
+            path: '/questionBank/',
             name: 'questionBank',
             component: () => import('../views/questionBank/questionBank.vue'),
         },
         // 我的错题
         {
-            path: '/errorQuestion',
+            path: '/errorQuestion/',
             name: 'errorQuestion',
             component: () => import('../views/questionBank/errorQuestion.vue'),
         },
         // 模拟考试
         {
-            path: '/mockExam',
+            path: '/mockExam/',
             name: 'mockExam',
             component: () => import('../views/questionBank/mockExam.vue'),
         },
         // 模拟考试-成绩
         {
-            path: '/examScores',
+            path: '/examScores/',
             name: 'examScores',
             component: () => import('../views/questionBank/examScores.vue'),
         },
         // 我的收藏
         {
-            path: '/questionCollect',
+            path: '/questionCollect/',
             name: 'questionCollect',
             component: () => import('../views/questionBank/questionCollect.vue'),
         },
         // 顺序练题
         {
-            path: '/questionOrder',
+            path: '/questionOrder/',
             name: 'questionOrder',
             component: () => import('../views/questionBank/questionOrder.vue'),
         },
         // 专项练题
         {
-            path: '/specialPractice',
+            path: '/specialPractice/',
             name: 'specialPractice',
             component: () => import('../views/questionBank/specialPractice.vue'),
         },
