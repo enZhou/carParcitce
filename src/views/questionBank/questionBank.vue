@@ -6,10 +6,10 @@
     <div class="bank-content">
       <!-- 选择科目Tabs -->
       <div class="cnt_tab">
-        <div class="cnt_tab_item" @click="changeType(0)">
+        <div class="cnt_tab_item" @click="changeType(2)">
           <span :class="bankType===0?'active':''">科目一</span>
         </div>
-        <div class="cnt_tab_item" @click="changeType(1)">
+        <div class="cnt_tab_item" @click="changeType(3)">
           <span :class="bankType===1?'active':''">科目四</span>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default {
   },
   async created() {
     const vm = this;
-    document.title = '教练通'
+    document.title = "教练通";
     vm.userInfo = JSON.parse(getStore("loginInfo"));
     if (vm.userInfo) {
       vm.getMainData(vm.userInfo.user_id);
@@ -208,12 +208,21 @@ export default {
       this.$router.push("/login");
       return false;
     }
+    if (vm.$route.query.type || vm.$route.query.type === "0") {
+      vm.changeType(vm.$route.query.type * 1);
+    }
   },
   methods: {
     // 选择模式
     changeType(val) {
       let vm = this;
-      vm.bankType = val;
+      if (val == 1 || val == 2) {
+        vm.bankType = 0;
+      } else if (val == 4 || val == 3) {
+        vm.bankType = 1;
+      } else {
+        vm.bankType = val;
+      }
       vm.getMainData(vm.userInfo.user_id);
       if (val === 1) {
         vm.dlType = 1;
@@ -234,11 +243,12 @@ export default {
     getMainData(id) {
       const vm = this;
       let type = null;
-      if (vm.bankType === 0) {
+      if (vm.bankType == 0) {
         type = vm.dlType;
-      } else if (vm.bankType === 1) {
+      } else if (vm.bankType == 1) {
         type = 4;
       }
+      console.log(id);
       vm.getDataType = type;
       api.getDrivingMain(id, type).then(res => {
         vm.dlData = res;
@@ -281,7 +291,7 @@ export default {
       let vm = this;
       if (vm.getDataType == 1) {
         vm.dialogContent = `小车- C1/C2/C3 科目一，考试时间45分钟，共100道题，模拟考试下不能修改答案，每做错一题扣1分，合格标准为90分`;
-      }else if (vm.getDataType == 4){
+      } else if (vm.getDataType == 4) {
         vm.dialogContent = `小车- C1/C2/C3 科目四，考试时间45分钟，共50道题，模拟考试下不能修改答案，每做错一题扣2分，合格标准为90分`;
       }
       vm.isShowDialog = true;
@@ -289,7 +299,9 @@ export default {
     // 弹窗确认
     okDialog() {
       let vm = this;
-      vm.$router.push(`/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`);
+      vm.$router.push(
+        `/mockExam/?type=${vm.getDataType}&score=${vm.dlData.score}`
+      );
     }
   }
 };

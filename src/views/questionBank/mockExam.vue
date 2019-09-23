@@ -285,6 +285,7 @@ export default {
           } else {
             element.isAnswer = false;
             vm.$refs.questionFooter.setNum(0, 1);
+            vm.setDrivingWrong(element.id);
           }
         }
       });
@@ -297,7 +298,18 @@ export default {
         question_answer: qa,
         submit_answer: sa
       });
-    }
+    },
+  //提交错题
+  setDrivingWrong(questionId) {
+    let vm = this;
+    api
+      .setDrivingWrong(vm.userInfo.user_id, vm.$route.query.type, questionId)
+      .then(res => {});
+  },
+  },
+  destroyed() {
+    INDEX = 0;
+    SCORE = 0; // 分数
   }
 };
 </script>

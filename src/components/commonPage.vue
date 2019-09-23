@@ -138,7 +138,7 @@ export default {
     goBack() {
       let vm = this;
       vm.$router.replace(
-        `/questionBank/`
+        `/questionBank/?type=${vm.$route.query.type || "1"}`
       );
     },
     changemodal(type) {
