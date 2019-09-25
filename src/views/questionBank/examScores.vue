@@ -51,6 +51,7 @@
   </div>
 </template>
 <script>
+import { setStore, getStore, removeStore } from "../../common/util.js";
 export default {
   data() {
     return {
@@ -60,6 +61,7 @@ export default {
       showTime: "",
       OFFSCORE: 90, // 及格线
       showTitle: {},
+      userInfo: null,
       failList: [
         {
           title: "马路杀手",
@@ -95,12 +97,18 @@ export default {
     if (this.$route.name === "examScores") {
       title += "考试成绩";
     }
+
+    vm.userInfo = JSON.parse(getStore("loginInfo"));
     document.title = title;
   },
   mounted() {
     let vm = this;
     if (Object.keys(vm.$route.query).length > 0) {
-      vm.score = vm.$route.query.score;
+      if (vm.$route.query.type == 4) {
+        vm.score = vm.$route.query.score * 2;
+      } else {
+        vm.score = vm.$route.query.score;
+      }
       vm.maxScore = vm.$route.query.maxCore;
       vm.time = vm.$route.query.time;
     }
@@ -122,9 +130,15 @@ export default {
     },
     lockErr() {
       let vm = this;
-      vm.$router.replace(
-        `errorQuestion/?type=${vm.$route.query.type}`
-      );
+      if (
+        getStore(`${vm.userInfo.user_id}vehicleListError`) &&
+        JSON.parse(getStore(`${vm.userInfo.user_id}vehicleListError`)).length >
+          0
+      ) {
+        vm.$router.replace(`examList/?type=${vm.$route.query.type}`);
+      } else {
+        vm.$toast("当前暂时没有错题！");
+      }
     }
   }
 };

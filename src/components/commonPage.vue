@@ -120,6 +120,11 @@ export default {
           vm.showAnswer = false;
           vm.changemodal("recite");
           break;
+        case "/examList/":
+          title += "->我的错题";
+          vm.showAnswer = false;
+          vm.changemodal("recite");
+          break;
         case "/questionOrder/":
           title += "->顺序练习";
           break;

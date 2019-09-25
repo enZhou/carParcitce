@@ -46,7 +46,7 @@ import Question from "../../components/question.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import questionDialog from "../../components/questionDialog.vue";
 import api from "../../api/common.js";
-import { getStore } from "../../common/util.js";
+import { setStore, getStore, removeStore } from "../../common/util.js";
 var INDEX = 0;
 var PAGENUM = 100; // 每页条数
 var SCORE = 0; // 分数
@@ -98,7 +98,8 @@ export default {
         15: "134",
         16: "234",
         17: "1234"
-      }
+      },
+      errorList: []
     };
   },
   async created() {
@@ -147,12 +148,13 @@ export default {
     ok: function() {
       let vm = this;
       let time = vm.$refs.commonPage.getTime();
+      setStore(`${vm.userInfo.user_id}vehicleListError`, vm.errorList);
       api
         .setSubmitTest(
           vm.userInfo.user_id,
           vm.$route.query.type,
           time,
-          SCORE,
+          vm.$route.query.type == 4 ? SCORE * 2 : SCORE,
           JSON.stringify(vm.answerList)
         )
         .then(res => {
@@ -284,6 +286,7 @@ export default {
             vm.$refs.questionFooter.setNum(1, 0);
           } else {
             element.isAnswer = false;
+            vm.errorList.push(element);
             vm.$refs.questionFooter.setNum(0, 1);
             vm.setDrivingWrong(element.id);
           }
@@ -299,13 +302,13 @@ export default {
         submit_answer: sa
       });
     },
-  //提交错题
-  setDrivingWrong(questionId) {
-    let vm = this;
-    api
-      .setDrivingWrong(vm.userInfo.user_id, vm.$route.query.type, questionId)
-      .then(res => {});
-  },
+    //提交错题
+    setDrivingWrong(questionId) {
+      let vm = this;
+      api
+        .setDrivingWrong(vm.userInfo.user_id, vm.$route.query.type, questionId)
+        .then(res => {});
+    }
   },
   destroyed() {
     INDEX = 0;

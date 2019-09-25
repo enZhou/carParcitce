@@ -161,6 +161,10 @@ export default {
     total(val, old) {
       console.log(val);
     }
+  },
+  destroyed() {
+    let vm = this;
+    vm.clickId = null;
   }
 };
 </script>

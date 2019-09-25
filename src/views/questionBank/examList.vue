@@ -1,7 +1,7 @@
-<!-- 模拟考试 -->
+<!-- 我的错题 -->
 <template>
   <div>
-    <commonPage ref="commonPage" :active="active" :showType="showType"></commonPage>
+    <commonPage ref="commonPage" :active="active" :showType="showType" @changeModal="changeType"></commonPage>
     <div class="question-content">
       <ul
         class="question-ul"
@@ -11,9 +11,18 @@
       >
         <li class="question-item" v-for="(item,index) in topicArr" :key="index">
           <question
+            v-if="active === 'answer'"
+            :topicInfo="item"
+            :info="false"
+            @yetTipicList="yetTipicList"
+            :isShowErrExplain="isShowErrExplain"
+            ref="question"
+          ></question>
+          <question
             v-if="active === 'recite'"
             :topicInfo="item"
-            :isShowErrExplain="true"
+            @yetTipicList="yetTipicList"
+            :isShowErrExplain="isShowErrExplain"
             :info="true"
             ref="question"
           ></question>
@@ -25,8 +34,10 @@
       ref="questionFooter"
       :submit="false"
       :uncollected="true"
+      :del="true"
       @gotoIndex="gotoIndex"
       @httpCollection="httpCollection"
+      @delClk="delClk"
     ></question-footer>
   </div>
 </template>
@@ -36,7 +47,7 @@ import Question from "../../components/question.vue";
 import questionFooter from "../../components/questionFooter.vue";
 import questionDialog from "../../components/questionDialog.vue";
 import api from "../../api/common.js";
-import { getStore } from "../../common/util.js";
+import { setStore, getStore, removeStore } from "../../common/util.js";
 var INDEX = 0;
 var PAGENUM = 0; // 每页条数
 var SCORE = 0; // 分数
@@ -49,10 +60,10 @@ export default {
   },
   data() {
     return {
-      active: "recite",
+      active: "answer",
       showType: "tab",
       userInfo: null, // 用户信息
-      topicArr: [], // 题目信息
+      topicArr: new Array(), // 题目信息
       changeAnswer: {
         1: "1",
         2: "2",
@@ -83,6 +94,8 @@ export default {
       readIndex: 0,
       answerList: [], // 已回答目录
       maxScore: 0, // 最佳成绩
+      isShowErrExplain: false, // 错误详解
+      saveShowErrExplain: false,
       userTopicInfo: {
         last_read_id: null, // 历史阅读位置题目id
         total: null, // 题目总数
@@ -100,48 +113,68 @@ export default {
       let vm = this;
       vm.userInfo = JSON.parse(getStore("loginInfo"));
       vm.maxScore = vm.$route.query.score;
-      if (Object.keys(vm.$route.query).length > 0) {
-        api
-          .getCollectionList(vm.userInfo.user_id, vm.$route.query.type)
-          .then(res => {
-            console.log(res);
-            if (res.list.length <= 0) {
-              vm.$toast("暂无数据～", true);
-              vm.$router.replace("/questionBank");
-              return false;
-            }
-            PAGENUM = res.list.length;
-            vm.topicArr = [];
-            vm.changeData(res.list, list => {
-              vm.topicArr = Object.assign([], list);
-              vm.$nextTick(() => {
-                vm.initSlide();
-                vm.nextOne();
-                vm.setCollection();
-              });
-            });
-          });
+
+      if (!getStore(`${vm.userInfo.user_id}vehicleListError`)) {
+        vm.topicArr = [];
+      } else {
+        vm.topicArr = JSON.parse(
+          getStore(`${vm.userInfo.user_id}vehicleListError`)
+        );
       }
+      if (vm.topicArr.length > 0) {
+        PAGENUM = vm.topicArr.length;
+        vm.$nextTick(() => {
+          vm.initSlide();
+          vm.nextOne();
+          vm.setCollection();
+        });
+      } else {
+        vm.$router.replace(
+          `/questionBank/?type=${vm.$route.query.type || "1"}`
+        );
+      }
+      //   if (Object.keys(vm.$route.query).length > 0) {
+      //     api
+      //       .getDrivingWrongList(vm.userInfo.user_id, vm.$route.query.type)
+      //       .then(res => {
+      //         if (res.list.length <= 0) {
+      //           vm.$toast("暂无数据～", true);
+      //           vm.$router.replace("/questionBank");
+      //           return false;
+      //         }
+      //         // vm.changeData(res.list, list => {
+      //         // });
+      //       });
+      //   }
     },
     // 组装数据
     changeData(list, callback) {
       let newList = [];
       list.forEach(item => {
         newList.push({
-          answer: item.question_info.answer + "",
+          answer: item.question_info.answer,
           explains: item.question_info.explains,
           id: item.question_info.id,
-          is_collection: true,
+          is_collection: item.question_info.is_collection,
           item1: item.question_info.item1,
           item2: item.question_info.item2,
           item3: item.question_info.item3,
           item4: item.question_info.item4,
           question: item.question_info.question,
-          url: item.question_info.url,
-          changeAnswer: this.changeAnswer[item.question_info.answer] + ""
+          url: item.question_info.url
         });
       });
       callback && callback(newList);
+    },
+    //选择模式
+    changeType(val) {
+      let self = this;
+      self.active = val;
+      if (self.active === "recite") {
+        self.isShowErrExplain = true;
+      } else {
+        self.isShowErrExplain = self.saveShowErrExplain;
+      }
     },
     // 修改收藏状态
     httpCollection(type) {
@@ -171,6 +204,16 @@ export default {
         vm.topicArr[INDEX].is_collection || false,
         vm.topicArr[INDEX].id
       );
+    },
+    // 移除错题
+    delClk(id) {
+      let vm = this;
+      api
+        .setDrivingClearWrong(vm.userInfo.user_id, vm.topicArr[INDEX].id)
+        .then(res => {
+          this.$toast("移除成功");
+          vm.initPage();
+        });
     },
     resetModal() {
       const vm = this;
@@ -287,11 +330,14 @@ export default {
     // 答题
     yetTipicList(id, qa, sa) {
       let vm = this;
+      vm.isShowErrExplain = true; // 错误详解
       vm.topicArr.forEach((element, index) => {
         if (element.id === id + "") {
           if (qa + "" === sa + "") {
+            vm.saveShowErrExplain = true;
             element.isAnswer = true;
           } else {
+            vm.saveShowErrExplain = false;
             element.isAnswer = false;
           }
         }
@@ -308,10 +354,8 @@ export default {
     }
   },
   destroyed() {
-    console.log('123123123')
-    INDEX = 0;
-    PAGENUM = 0; // 每页条数
-    SCORE = 0; // 分数
+    let vm = this;
+    removeStore(`${vm.userInfo.user_id}vehicleListError`);
   }
 };
 </script>

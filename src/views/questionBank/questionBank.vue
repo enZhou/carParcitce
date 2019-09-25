@@ -248,7 +248,6 @@ export default {
       } else if (vm.bankType == 1) {
         type = 4;
       }
-      console.log(id);
       vm.getDataType = type;
       api.getDrivingMain(id, type).then(res => {
         vm.dlData = res;

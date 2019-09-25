@@ -129,6 +129,12 @@ const router = new Router({
             name: 'specialPractice',
             component: () => import('../views/questionBank/specialPractice.vue'),
         },
+        // 考试错题列表
+        {
+            path: '/examList/',
+            name: 'examList',
+            component: () => import('../views/questionBank/examList.vue'),
+        },
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {

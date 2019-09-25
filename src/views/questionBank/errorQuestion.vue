@@ -1,4 +1,4 @@
-<!-- 模拟考试 -->
+<!-- 我的错题 -->
 <template>
   <div>
     <commonPage ref="commonPage" :active="active" :showType="showType" @changeModal="changeType"></commonPage>
@@ -312,7 +312,10 @@ export default {
         vm.topicArr,
         INDEX
       );
-      vm.$refs.questionFooter.getCollection(vm.topicArr[INDEX].is_collection === undefined?false:true, vm.topicArr[INDEX].id);
+      vm.$refs.questionFooter.getCollection(
+        vm.topicArr[INDEX].is_collection === undefined ? false : true,
+        vm.topicArr[INDEX].id
+      );
     },
     // 答题
     yetTipicList(id, qa, sa) {
@@ -339,6 +342,11 @@ export default {
         submit_answer: sa
       });
     }
+  },
+  destroyed() {
+    INDEX = 0;
+    PAGENUM = 0; // 每页条数
+    SCORE = 0; // 分数
   }
 };
 </script>
