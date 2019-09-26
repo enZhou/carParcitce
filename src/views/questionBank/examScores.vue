@@ -140,6 +140,11 @@ export default {
         vm.$toast("当前暂时没有错题！");
       }
     }
+  },
+  destroyed() {
+    let vm = this;
+    vm.score = 0;
+    vm.maxScore = 0;
   }
 };
 </script>

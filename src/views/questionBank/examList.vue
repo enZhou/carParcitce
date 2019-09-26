@@ -355,6 +355,9 @@ export default {
   },
   destroyed() {
     let vm = this;
+    INDEX = 0;
+    PAGENUM = 0; // 每页条数
+    SCORE = 0; // 分数
     removeStore(`${vm.userInfo.user_id}vehicleListError`);
   }
 };

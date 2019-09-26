@@ -308,7 +308,6 @@ export default {
     }
   },
   destroyed() {
-    console.log('123123123')
     INDEX = 0;
     PAGENUM = 0; // 每页条数
     SCORE = 0; // 分数

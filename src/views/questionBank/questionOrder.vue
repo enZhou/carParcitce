@@ -57,7 +57,7 @@ export default {
   components: {
     commonPage,
     questionFooter,
-    Question,
+    Question
   },
 
   data() {
@@ -436,7 +436,7 @@ export default {
         .setCollection(
           vm.userInfo.user_id,
           vm.$route.query.type,
-          vm.userTopicInfo.readIndex,
+          vm.topicCacheData[vm.userTopicInfo.readIndex].id,
           type
         )
         .then(res => {
@@ -450,6 +450,9 @@ export default {
         .setDrivingWrong(vm.userInfo.user_id, vm.$route.query.type, questionId)
         .then(res => {});
     }
+  },
+  destroyed() {
+    INDEX = 0;
   }
 };
 </script>
